@@ -20,9 +20,6 @@ suppressMessages(require(data.table))
 suppressMessages(require(gridExtra))
 
 
-#xx <- as.list(GOTERM)
-
-
 
 ui <- fluidPage(
     shinyjs::useShinyjs(),
@@ -274,7 +271,7 @@ server <- function(input, output, session) {
             (TRUE %in% grepl(rv$Controlid,colnames(rv$NEX_data1))) &
             (TRUE %in% grepl(rv$Caseid,colnames(rv$NEX_data1))) &
             !(TRUE %in% grepl('GO:00',rv$NEX_data1[,grep('ID',
-                colnames(rv$NEX_data1),value = T)])))) {
+                colnames(rv$NEX_data1),value = TRUE)])))) {
                 return('Expression file sucessfully uploaded!')
         }
     })
@@ -288,7 +285,7 @@ server <- function(input, output, session) {
             (TRUE %in% grepl(rv$Controlid,colnames(rv$NEX_data1))) &
             (TRUE %in% grepl(rv$Caseid,colnames(rv$NEX_data1))) &
             !(TRUE %in% grepl('GO:00',rv$NEX_data1[,grep(
-                 'ID',colnames(rv$NEX_data1),value = T)])))) {
+                 'ID',colnames(rv$NEX_data1),value = TRUE)])))) {
                 return(paste0('The uploaded expression file contains:
                     A total of ',length(rownames(rv$NEX_data2)),' entries.'))
         }
@@ -303,7 +300,7 @@ server <- function(input, output, session) {
             (TRUE %in% grepl(rv$Controlid,colnames(rv$NEX_data1))) &
             (TRUE %in% grepl(rv$Caseid,colnames(rv$NEX_data1))) &
             !(TRUE %in% grepl('GO:00',rv$NEX_data1[,grep('ID',
-                colnames(rv$NEX_data1),value = T)])))) {
+                colnames(rv$NEX_data1),value = TRUE)])))) {
                 return(paste0('The uploaded expression file contains: ',
                     length(unique(rv$NEX_data2[,1])),' unique targets.'))
         }
@@ -318,7 +315,7 @@ server <- function(input, output, session) {
             (TRUE %in% grepl(rv$Controlid,colnames(rv$NEX_data1)))
             & (TRUE %in% grepl(rv$Caseid,colnames(rv$NEX_data1))) &
             (TRUE %in% grepl('GO:00',rv$NEX_data1[,grep('ID',
-                colnames(rv$NEX_data1),value = T)])))) {
+                colnames(rv$NEX_data1),value = TRUE)])))) {
                 return('Error: Failed to upload diferential expression file!
                     The selected file may not contain the columns of the
                     same Case/Control contemplated in the GFAG output file
@@ -337,7 +334,7 @@ server <- function(input, output, session) {
             (TRUE %in% grepl(rv$Controlid,colnames(rv$NEX_data1))) &
             (TRUE %in% grepl(rv$Caseid,colnames(rv$NEX_data1))) &
             (TRUE %in% grepl('GO:00',rv$NEX_data1[,grep('ID',
-                colnames(rv$NEX_data1),value = T)])))) {
+                colnames(rv$NEX_data1),value = TRUE)])))) {
                 return(paste0('The uploaded expression file contains:
                     No expression file was uploaded!'))
         }
@@ -435,7 +432,7 @@ server <- function(input, output, session) {
                                 (! (TRUE %in% grepl('GO:00',
                                     rv$NEX_data1[,grep('ID',
                                         colnames(rv$NEX_data1),
-                                        value = T)]))))) {
+                                        value = TRUE)]))))) {
                                         shinyjs::disabled(wellPanel(
                                             style = "background-color:
                                                 #c6c6c6;border:
@@ -458,7 +455,7 @@ server <- function(input, output, session) {
                                             (TRUE %in% grepl('GO:00',
                                                 rv$NEX_data1[,grep('ID',
                                                 colnames(rv$NEX_data1),
-                                                value = T)])))) {
+                                                value = TRUE)])))) {
                                                     wellPanel(style =
                                                     "background-color:
                                                     #ffffff;border:

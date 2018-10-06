@@ -170,7 +170,7 @@ server <- function(input, output, session) {
                     sep=input$sep,
                     header = input$header,
                     stringsAsFactors = input$stringAsFactors),silent = TRUE)
-                if (class(input_file_dt)=='data.frame') {
+                if (is.data.frame(input_file_dt)) {
                     rv$GFAG_data1<-input_file_dt
                     rv$GFAG_data2<-input_file_dt
                 }
@@ -235,13 +235,13 @@ server <- function(input, output, session) {
                     sep=input$sep,
                     header = input$header,
                     stringsAsFactors = input$stringAsFactors))
-                if (class(input_file_dt)=='data.frame' &
+                if (is.data.frame(input_file_dt) &
                     length(rownames(input_file_dt))<=50) {
                     return('The file was sucessfully uploaded! Use the "Data"
                            tab to check if your file is correctly formated!')
                 }
                     else{
-                        if (class(input_file_dt)=='data.frame' &
+                        if (is.data.frame(input_file_dt) &
                             length(rownames(input_file_dt))>50) {
                             return('The file was sucessfully uploaded! Use the
                                    "Data" tab to check if your file is
