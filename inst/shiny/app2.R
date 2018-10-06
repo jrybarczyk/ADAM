@@ -205,8 +205,7 @@ server <- function(input, output, session) {
                     stringsAsFactors = TRUE)
       if ( (is.null(rv$GFAG_data) & is.null(a)) | (!is.null(rv$GFAG_data)
             & is.null(a)) | ((!(is.null(rv$GFAG_data)) & !is.null(a)) &
-            (length(colnames(a))>=3) &
-            (TRUE %in% grepl(rv$Controlid,colnames(a)))
+            (length(colnames(a))>=3) & (TRUE %in% grepl(rv$Controlid,colnames(a)))
             & (TRUE %in% grepl(rv$Caseid,colnames(a)))
             & (TRUE %in% grepl('GO:00',a[,grep('ID',colnames(a),value = TRUE
             )])))
@@ -2308,7 +2307,7 @@ server <- function(input, output, session) {
         colnames(rv$DEA_data2))]<-'q.value'
 
         rv$DEA_data3<-DEA_data3
-        mydt3<-merge(mydt1,DEA_data3,by.x='Probe_Gene_ID',all.x=T)
+        mydt3<-merge(mydt1,DEA_data3,by.x='Probe_Gene_ID',all.x=TRUE)
         mydt3<-mydt3[!(is.na(mydt3$GO.ID)),]
 
         rv$mydt5<-subset(mydt3,mydt3$GO.ID %in% rv$filtered_gfag)
@@ -2646,13 +2645,12 @@ server <- function(input, output, session) {
             data.m2<-data.m%>%
             mutate(G_logFC=ifelse(data.m$logFC > -1 & data.m$logFC < 1,
                 '-1<logFC<1',ifelse(logFC <= -1,'logFC<=-1','logFC>=1')))%>%
-                mutate(G_qvalue=ifelse(format(data.m$q.value,scientific = 
-                    FALSE) <=
-                    0.05 & format(data.m$q.value,scientific = FALSE)
-                    > 0.01,'*',
+                mutate(G_qvalue=ifelse(
+                    format(data.m$q.value,scientific = FALSE) <=0.05 &
+                    format(data.m$q.value,scientific = FALSE)> 0.01,'*',
                     ifelse(format(data.m$q.value,scientific = FALSE) <= 0.01 &
                     format(data.m$q.value,scientific = FALSE) > 0.001,'**',
-                    ifelse(format(data.m$q.value,scientific = FALSE) <= 0.001 ,
+                    ifelse(format(data.m$q.value,scientific = FALSE) <= 0.001,
                     '***','NS'))))
             sg<-rep(sign(data.m2$value[data.m2$variable=='Case']
                 -data.m2$value[data.m2$variable=='Control']),2)
@@ -2951,8 +2949,8 @@ server <- function(input, output, session) {
                         ifelse(format(data.m$q.value,scientific = FALSE)
                         <= 0.01 &
                         format(data.m$q.value,scientific = FALSE) > 0.001,'**',
-                        ifelse(format(data.m$q.value,scientific = 
-                        FALSE) <= 0.001 ,
+                        ifelse(format(
+                            data.m$q.value,scientific =  FALSE) <= 0.001 ,
                         '***','NS'))))
             sg<-rep(sign(data.m2$value[data.m2$variable=='Case']-
                 data.m2$value[data.m2$variable=='Control']),2)
@@ -3092,12 +3090,16 @@ server <- function(input, output, session) {
             data.m2<-data.m%>%
             mutate(G_logFC=ifelse(data.m$logFC > -1 & data.m$logFC < 1,
                 '-1<logFC<1',ifelse(logFC <= -1,'logFC<=-1','logFC>=1')))%>%
-                 mutate(G_qvalue=ifelse(format(data.m$q.value,scientific = 
-                    FALSE) <= 0.05 & format(data.m$q.value,scientific = FALSE)
-                    > 0.01,'*', ifelse(format(data.m$q.value,scientific = 
-                    FALSE) <= 0.01 & format(data.m$q.value,scientific = FALSE) 
-                    > 0.001,'**', ifelse(format(data.m$q.value,scientific = 
-                    FALSE) <= 0.001 , '***','NS'))))
+                 mutate(G_qvalue=ifelse(format(
+                     data.m$q.value,scientific = FALSE) <= 0.05 &
+                         format(data.m$q.value,scientific = FALSE) > 0.01,
+                     '*', ifelse(format(
+                        data.m$q.value,scientific = FALSE) <= 0.01 &
+                            format(data.m$q.value,scientific = FALSE) > 0.001,
+                        '**',
+                        ifelse(format(
+                            data.m$q.value,scientific = FALSE) <= 0.001 ,
+                            '***','NS'))))
             sg<-rep(sign(data.m2$value[data.m2$variable=='Case']-
             data.m2$value[data.m2$variable=='Control']),2)
             data.m2$Sign<-sg
