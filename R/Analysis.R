@@ -91,7 +91,7 @@
 #' data(KeggPathwaysAedes)
 #' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
 #' "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 3L,
-#' MaxGene = 1000L, SeedNumber = 1049, BootstrapNumber = 10000L,
+#' MaxGene = 1000L, SeedNumber = 1049, BootstrapNumber = 1000L,
 #' PCorrection = 0.05, DBSpecies = KeggPathwaysAedes, 
 #' PCorrectionMethod = "fdr",
 #' WilcoxonTest = TRUE, FisherTest = TRUE, AnalysisDomain = "own", 
@@ -105,6 +105,7 @@
 #' #Partial Analysis with Homo sapiens through ADAnalysis function
 #' #(there is an annotation package called org.Hs.eg.db)
 #' ##
+#' \dontrun{
 #' data(ExpressionHs)
 #' ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
 #' ExpressionData = ExpressionHs, MinGene = 3L, MaxGene = 1000L, 
@@ -118,7 +119,6 @@
 #' #Complete Analysis with Homo sapiens through GFAGAnalysis function
 #' #(there is an annotation package called org.Hs.eg.db)
 #' ##
-#' \dontrun{
 #' data(ExpressionHs)
 #' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1"),
 #' ExpressionData = ExpressionHs, MinGene = 3L,
