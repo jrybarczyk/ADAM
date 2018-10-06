@@ -1,6 +1,6 @@
 #' @title GFAGpathUi
 #' @description Launch GFAGpathUi Graphical User Interface (GUI) in local
-#' machine or default browser.
+#' machine or default browser system.
 #' @details This shiny (GUI) enables the visualization and plotting of
 #' P.value distribution of the Paths in the GFAG output file. The plots
 #' were optimized for a maximun of 50 Paths, you can still plot more than 50
@@ -52,4 +52,3 @@ GFAGpathUi <-function(browser){
     error = function(e) {print("Parameter must be TRUE or FALSE")
     }
     )}
-
