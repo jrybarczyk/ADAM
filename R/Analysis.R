@@ -13,17 +13,17 @@
 #' @description Analysis of functionally associated gene groups, based on
 #' gene diversity and activity, for different species according to existing 
 #' annotation packages or user's own annotations.
-#' @param ComparisonID Sample comparisons identification. It must be a vector
-#' in wich each element corresponds to 2 sample columns from the expression 
-#' data. The data sample columns in each element from the vector are comma 
-#' separated. The first one refers to the control sample, while the second
-#' refers to the experiment.
+#' @param ComparisonID Sample comparisons identification. It must be a vector in
+#' wich each element corresponds to 2 sample columns from the expression data.
+#' The data sample columns in each element from the vector are comma separated. 
+#' The first one refers to the control sample, while the second refers to the 
+#' experiment.
 #' @param ExpressionData Gene expression data (microarray or RNA-seq, for
 #' example). It must be a data frame or a path for a text file tab separated
 #' containing at least 3 columns. First column mandatory corresponds to the 
-#' gene identification, according to GeneIdentifier argument. Second, third 
-#' and the other columns correspond to the gene expression values realated to 
-#' the genes in the first column and each of these columns correspond to a
+#' gene identification, according to GeneIdentifier argument. Second, third and
+#' the other columns correspond to the gene expression values realated to the
+#' genes in the first column and each of these columns correspond to a
 #' different sample (control versus experiment).
 #' @param MinGene Minimum number of genes per GFAG. It must be a positive
 #' integer value different from zero and lower than MaxGene argument.
@@ -37,8 +37,8 @@
 #' 0 and 1.
 #' @param DBSpecies A string corresponding to an OrgDb species package 
 #' according to AvailableDBSpecies list. If there is no annotation package,
-#' it's possible to use an own gene annotation file containing 3 columns: 
-#' gene, term annotation code and description of the term annotation. 
+#' it's possible to use an own gene annotation file containing 3 columns: gene, 
+#' term annotation code and description of the term annotation. 
 #' @param PCorrectionMethod Method p-value correction: holm, hochberg, hommel,
 #' bonferroni, bh, by or fdr (default is "fdr").
 #' @param WilcoxonTest A logical value indicating whether or not to perform
@@ -46,14 +46,14 @@
 #' @param FisherTest  A logical value indicating whether or not to perform
 #' Fisher's exact test (TRUE for performing and FALSE for not performing).
 #' @param AnalysisDomain Analysis domain to be considered for building GFAGs, 
-#' according: gobp (Gene Ontology - Biological Processes), gocc (Gene Ontology
-#'  - Celular Components), gomf (Gene Ontology - Molecular Functions), kegg
-#' (KEGG Pathways) or own (if there is no annotation package - the annotations 
-#' were defined in a file by user).
+#' according: gobp (Gene Ontology - Biological Processes), gocc (Gene Ontology -
+#' Celular Components), gomf (Gene Ontology - Molecular Functions), kegg (KEGG
+#' Pathways) or own (if there is no annotation package - the annotations were 
+#' defined in a file by user).
 #' @param GeneIdentifier Gene nomenclature to be used: symbol, entrez, tair
 #' (for Arabdopsis thaliana) or orf (for Saccharomyces cerevisiae or 
-#' Plasmodium falciparum). If there is no annotation package, just put the 
-#' gene nomenclature present in the user's (own) annotations.
+#' Plasmodium falciparum). If there is no annotation package, just put the gene
+#' nomenclature present in the user's (own) annotations.
 #' @details The genes present in the expression data are grouped by their 
 #' respective functions according to the domains described by 
 #' AnalysisDomain argument. The relationship between genes and functions are 
@@ -62,17 +62,17 @@
 #' be provided. For each GFAG, gene diversity and activity in each sample are 
 #' calculated. As the package allways compare two samples (control versus 
 #' experiment), relative gene diversity and activity for each GFAG are
-#' calculated. Using bootstrap method, for each GFAG, according to relative 
-#' gene diversity and activity, two p-values are calculated. The p-values are 
-#' then corrected, according to the correction method defined by 
-#' PCorrectionMethod argument, generating a q-value. The significative GFAGs 
-#' will be those whoose q-value stay under the cutoff set by PCorrection 
-#' argument. Optionally, it's possible to run Wilcoxon test and/or Fisher's
-#' exact test. These tests also provide a corrected p-value, and siginificative
-#' groups can be seen through them. GFAGAnalysis function allows to run a
-#' complete analysis, using all available arguments. ADAnalysis function allows
-#' to run a partial analysis, where is calculated just gene diversity and 
-#' activity of each GFAG with no signicance by bootrstrap, Wilcoxon or Fisher.
+#' calculated. Using bootstrap method, for each GFAG, according to relative gene
+#' diversity and activity, two p-values are calculated. The p-values are then
+#' corrected, according to the correction method defined by PCorrectionMethod
+#' argument, generating a q-value. The significative GFAGs will be those whoose
+#' q-value stay under the cutoff set by PCorrection argument. Optionally, it's
+#' possible to run Wilcoxon test and/or Fisher's exact test. These tests also
+#' provide a corrected p-value, and siginificative groups can be seen through
+#' them. GFAGAnalysis function allows to run a complete analysis, using all 
+#' available arguments. ADAnalysis function allows to run a partial analysis,
+#' where is calculated just gene diversity and activity of each GFAG with no 
+#' signicance by bootrstrap, Wilcoxon or Fisher.
 #' @author André Luiz Molan (andre.molan@unesp.br)
 #' @references CASTRO, M. A., RYBARCZYK-FILHO, J. L., et al. Viacomplex:
 #' software for landscape analysis of gene expression networks in genomic
@@ -102,23 +102,9 @@
 #' head(ResultAnalysis[[2]][2]) #Result comparison 2
 #' 
 #' ##
-#' #Partial Analysis with Homo sapiens through ADAnalysis function
-#' #(there is an annotation package called org.Hs.eg.db)
-#' ##
-#' data(ExpressionHs)
-#' ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
-#' ExpressionData = ExpressionHs, MinGene = 3L, MaxGene = 1000L, 
-#' DBSpecies = "hs",
-#' AnalysisDomain = "gocc", GeneIdentifier = "symbol")
-#' 
-#' head(ResultAnalysis[[1]]) #Relation between genes and functions
-#' head(ResultAnalysis[[2]][1]) #Result comparison 1
-#'
-#' ##
 #' #Complete Analysis with Homo sapiens through GFAGAnalysis function
 #' #(there is an annotation package called org.Hs.eg.db)
 #' ##
-#' \dontrun{
 #' data(ExpressionHs)
 #' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1"),
 #' ExpressionData = ExpressionHs, MinGene = 3L,
@@ -130,7 +116,19 @@
 #' 
 #' head(ResultAnalysis[[1]]) #Relation between genes and functions
 #' head(ResultAnalysis[[2]][1]) #Result comparison 1
-#'}
+#' 
+#' ##
+#' #Partial Analysis with Homo sapiens through ADAnalysis function
+#' #(there is an annotation package called org.Hs.eg.db)
+#' ##
+#' data(ExpressionHs)
+#' ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
+#' ExpressionData = ExpressionHs, MinGene = 3L, MaxGene = 1000L, 
+#' DBSpecies = "hs",
+#' AnalysisDomain = "gocc", GeneIdentifier = "symbol")
+#' 
+#' head(ResultAnalysis[[1]]) #Relation between genes and functions
+#' head(ResultAnalysis[[2]][1]) #Result comparison 1
 #' @export
 
 GFAGAnalysis <- function(ComparisonID, ExpressionData, MinGene, MaxGene,
@@ -146,8 +144,7 @@ GFAGAnalysis <- function(ComparisonID, ExpressionData, MinGene, MaxGene,
                                 DBSpecies = DBSpecies, PCorrectionMethod = 
                                 PCorrectionMethod, WilcoxonTest = WilcoxonTest,
                                 FisherTest = FisherTest, AnalysisDomain =
-                                AnalysisDomain,
-                                GeneIdentifier = GeneIdentifier,
+                                AnalysisDomain, GeneIdentifier = GeneIdentifier,
                                 completeTest = TRUE)
     #GFAG Analysis
     ResultAnalysis <- lapply(ECGObject@ComparisonID, FUN = makeAnalysis,
