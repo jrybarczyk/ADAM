@@ -20,7 +20,6 @@ suppressMessages(require(data.table))
 suppressMessages(require(gridExtra))
 
 
-
 ui <- fluidPage(
     shinyjs::useShinyjs(),
     br(),
@@ -65,8 +64,6 @@ ui <- fluidPage(
                     uiOutput('BT4'),
                     tags$hr(),
                     uiOutput('golist'),
-                    #tags$hr(),
-                    #uiOutput('golist2'),
                     uiOutput('BT5'),
                     helpText('Click in the buttom above to update the value of
                         the selected GFAG/Path.'),
@@ -211,7 +208,8 @@ server <- function(input, output, session) {
             (length(colnames(a))>=3) &
             (TRUE %in% grepl(rv$Controlid,colnames(a)))
             & (TRUE %in% grepl(rv$Caseid,colnames(a)))
-            & (TRUE %in% grepl('GO:00',a[,grep('ID',colnames(a),value = T)])))
+            & (TRUE %in% grepl('GO:00',a[,grep('ID',colnames(a),value = TRUE
+            )])))
             | (((!(is.null(rv$GFAG_data))) & (!is.null(a)) ) &
             (!(length(colnames(a))>=3) |
             !(TRUE %in% grepl(rv$Controlid,colnames(a))) |
@@ -225,7 +223,7 @@ server <- function(input, output, session) {
                         (TRUE %in% grepl(rv$Controlid,colnames(a))) &
                         (TRUE %in% grepl(rv$Caseid,colnames(a))) &
                         !(TRUE %in% grepl('GO:00',a[,grep('ID',
-                            colnames(a),value = T)])))) {
+                            colnames(a),value = TRUE)])))) {
                             rv$NEX_data1<-a
                             rv$NEX_data2<-a
                     }
@@ -865,8 +863,8 @@ server <- function(input, output, session) {
                 return(paste0('The uploaded differential expression
                     file contains: ',
                 length(intersect(unique(rv$Path_data2[,1]),rv$DEA_data2[,1])),
-                ' targets in common with Path-to-Target data. All targets in the
-                differential expression file are contemplated in the
+                ' targets in common with Path-to-Target data. All targets in
+                the differential expression file are contemplated in the
                 Path-to-Target file!'))
             }
                 else{
@@ -934,8 +932,6 @@ server <- function(input, output, session) {
                         textOutput('DEA_text2'),
                         textOutput('DEA_text3'),
                         textOutput('DEA_text4'),
-                        #textOutput('DEA_text5'),
-                        #textOutput('DEA_text6'),
                         tags$style(type="text/css",
                         ".shiny-output-error { visibility: hidden; }",
                         ".shiny-output-error:before { visibility: hidden; }"),
@@ -953,8 +949,6 @@ server <- function(input, output, session) {
                             textOutput('DEA_text2'),
                             textOutput('DEA_text3'),
                             textOutput('DEA_text4'),
-                            #textOutput('DEA_text5'),
-                            #textOutput('DEA_text6'),
                             tags$style(type="text/css",
                             ".shiny-output-error { visibility: hidden; }",
                             ".shiny-output-error:before { visibility: hidden;
@@ -974,8 +968,6 @@ server <- function(input, output, session) {
                                     textOutput('DEA_text2'),
                                     textOutput('DEA_text3'),
                                     textOutput('DEA_text4'),
-                                    #textOutput('DEA_text5'),
-                                    #textOutput('DEA_text6'),
                                     tags$style(type="text/css",
                                         ".shiny-output-error { visibility:
                                         hidden; }",
@@ -1003,8 +995,6 @@ server <- function(input, output, session) {
                                         textOutput('DEA_text2'),
                                         textOutput('DEA_text3'),
                                         textOutput('DEA_text4'),
-                                        # textOutput('DEA_text5'),
-                                        #  textOutput('DEA_text6'),
                                         tags$style(type="text/css",
                                             ".shiny-output-error {
                                             visibility: hidden; }",
@@ -1533,7 +1523,8 @@ server <- function(input, output, session) {
                                         rv$Path_data2[,1]),rv$NEX_data2[,1]))-
                                     length(unique(rv$Path_data2[,1]))),
                                     ' targets in your expression file not
-                                    contemplated in your Path-to-Target file!'))
+                                    contemplated in your Path-to-Target 
+                                    file!'))
                                 }
                             }
                     }
@@ -2295,7 +2286,7 @@ server <- function(input, output, session) {
         colnames(NEX_data3)[2]<-'Control'
         colnames(NEX_data3)[3]<-'Case'
 
-        mydt1<-merge(path_data,NEX_data3,by.x='Probe_Gene_ID',all.x=T)
+        mydt1<-merge(path_data,NEX_data3,by.x='Probe_Gene_ID',all.x=TRUE)
 
         mydt1<-mydt1[!(is.na(mydt1$GO.ID)),]
 
@@ -2332,11 +2323,11 @@ server <- function(input, output, session) {
             '-1<logFC<1',ifelse(logFC <= -1,
             'logFC<=-1','logFC>=1')))%>%
             mutate(G_qvalue=ifelse(
-                format(data.m$q.value,scientific = F) <= 0.05 &
-                format(data.m$q.value,scientific = F) > 0.01,'*',
-                ifelse(format(data.m$q.value,scientific = F) <= 0.01 &
-                format(data.m$q.value,scientific = F) > 0.001,'**',
-                ifelse(format(data.m$q.value,scientific = F) <= 0.001 ,
+                format(data.m$q.value,scientific = FALSE) <= 0.05 &
+                format(data.m$q.value,scientific = FALSE) > 0.01,'*',
+                ifelse(format(data.m$q.value,scientific = FALSE) <= 0.01 &
+                format(data.m$q.value,scientific = FALSE) > 0.001,'**',
+                ifelse(format(data.m$q.value,scientific = FALSE) <= 0.001 ,
                 '***','NS'))))
         sg<-rep(sign(rv$data.m2$value[rv$data.m2$variable=='Case']-
             rv$data.m2$value[rv$data.m2$variable=='Control']),2)
@@ -2655,11 +2646,13 @@ server <- function(input, output, session) {
             data.m2<-data.m%>%
             mutate(G_logFC=ifelse(data.m$logFC > -1 & data.m$logFC < 1,
                 '-1<logFC<1',ifelse(logFC <= -1,'logFC<=-1','logFC>=1')))%>%
-                mutate(G_qvalue=ifelse(format(data.m$q.value,scientific = F) <=
-                    0.05 & format(data.m$q.value,scientific = F) > 0.01,'*',
-                    ifelse(format(data.m$q.value,scientific = F) <= 0.01 &
-                    format(data.m$q.value,scientific = F) > 0.001,'**',
-                    ifelse(format(data.m$q.value,scientific = F) <= 0.001 ,
+                mutate(G_qvalue=ifelse(format(data.m$q.value,scientific = 
+                    FALSE) <=
+                    0.05 & format(data.m$q.value,scientific = FALSE)
+                    > 0.01,'*',
+                    ifelse(format(data.m$q.value,scientific = FALSE) <= 0.01 &
+                    format(data.m$q.value,scientific = FALSE) > 0.001,'**',
+                    ifelse(format(data.m$q.value,scientific = FALSE) <= 0.001 ,
                     '***','NS'))))
             sg<-rep(sign(data.m2$value[data.m2$variable=='Case']
                 -data.m2$value[data.m2$variable=='Control']),2)
@@ -2684,13 +2677,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -2706,7 +2697,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -2726,13 +2716,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -2748,7 +2736,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -2788,14 +2775,14 @@ server <- function(input, output, session) {
                     rv$gg
                 })
             }
-    if (TRUE %in% ('try-error' %in% class(try(eval(parse(text=rv$ggt2)))))) {
+    rv$etest<-try(rv$ggt2)[[1]]
+    if ((inherits(try(eval(parse(text=rv$ggt2))[1]),'try-error'))){
         shinyjs::disabled('fplot')
     }
         else{
             shinyjs::enable('fplot')
         }
     }))
-
 
     observeEvent(input$plot_logfc,{
         if (rv$startfilter>0) {
@@ -2806,13 +2793,13 @@ server <- function(input, output, session) {
                     data.m$logFC < 1,'-1<logFC<1',
                     ifelse(logFC <= -1,'logFC<=-1','logFC>=1')))%>%
                         mutate(G_qvalue=ifelse(format(
-                            data.m$q.value,scientific = F) <= 0.05 &
-                            format(data.m$q.value,scientific = F) > 0.01,
+                            data.m$q.value,scientific = FALSE) <= 0.05 &
+                            format(data.m$q.value,scientific = FALSE) > 0.01,
                             '*',
-                            ifelse(format(data.m$q.value,scientific = F)
-                            <= 0.01 & format(data.m$q.value,scientific = F)
+                            ifelse(format(data.m$q.value,scientific = FALSE)
+                            <= 0.01 & format(data.m$q.value,scientific = FALSE)
                             > 0.001,'**',
-                            ifelse(format(data.m$q.value,scientific = F)
+                            ifelse(format(data.m$q.value,scientific = FALSE)
                             <= 0.001 ,'***','NS'))))
             sg<-rep(sign(data.m2$value[data.m2$variable=='Case']-
                 data.m2$value[data.m2$variable=='Control']),2)
@@ -2843,13 +2830,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -2865,7 +2850,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -2885,13 +2869,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -2907,7 +2889,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -2946,7 +2927,7 @@ server <- function(input, output, session) {
                 output[['myplot']]<-renderPlot({
                 rv$gg
                 })}
-    if (TRUE %in% ('try-error' %in% class(try(eval(parse(text=rv$ggt2)))))) {
+    if ((inherits(try(eval(parse(text=rv$ggt2))[1]),'try-error'))) {
         shinyjs::disabled('fplot')
     }
         else{
@@ -2964,12 +2945,14 @@ server <- function(input, output, session) {
                 data.m$logFC < 1,'-1<logFC<1',ifelse(logFC <= -1,
                 'logFC<=-1','logFC>=1')))%>%
                     mutate(G_qvalue=ifelse(format(
-                        data.m$q.value,scientific = F) <= 0.05 &
-                        format(data.m$q.value,scientific = F) > 0.01,
+                        data.m$q.value,scientific = FALSE) <= 0.05 &
+                        format(data.m$q.value,scientific = FALSE) > 0.01,
                         '*',
-                        ifelse(format(data.m$q.value,scientific = F) <= 0.01 &
-                        format(data.m$q.value,scientific = F) > 0.001,'**',
-                        ifelse(format(data.m$q.value,scientific = F) <= 0.001 ,
+                        ifelse(format(data.m$q.value,scientific = FALSE)
+                        <= 0.01 &
+                        format(data.m$q.value,scientific = FALSE) > 0.001,'**',
+                        ifelse(format(data.m$q.value,scientific = 
+                        FALSE) <= 0.001 ,
                         '***','NS'))))
             sg<-rep(sign(data.m2$value[data.m2$variable=='Case']-
                 data.m2$value[data.m2$variable=='Control']),2)
@@ -2997,13 +2980,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -3019,7 +3000,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -3039,13 +3019,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -3061,7 +3039,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -3099,7 +3076,7 @@ server <- function(input, output, session) {
                     rv$gg
                 })
             }
-    if (TRUE %in% ('try-error' %in% class(try(eval(parse(text=rv$ggt2)))))) {
+    if ((inherits(try(eval(parse(text=rv$ggt2))[1]),'try-error'))) {
         shinyjs::disabled('fplot')
     }
         else{
@@ -3115,12 +3092,12 @@ server <- function(input, output, session) {
             data.m2<-data.m%>%
             mutate(G_logFC=ifelse(data.m$logFC > -1 & data.m$logFC < 1,
                 '-1<logFC<1',ifelse(logFC <= -1,'logFC<=-1','logFC>=1')))%>%
-                 mutate(G_qvalue=ifelse(format(data.m$q.value,scientific = F)
-                    <= 0.05 & format(data.m$q.value,scientific = F) > 0.01,'*',
-                    ifelse(format(data.m$q.value,scientific = F) <= 0.01 &
-                    format(data.m$q.value,scientific = F) > 0.001,'**',
-                    ifelse(format(data.m$q.value,scientific = F) <= 0.001 ,
-                    '***','NS'))))
+                 mutate(G_qvalue=ifelse(format(data.m$q.value,scientific = 
+                    FALSE) <= 0.05 & format(data.m$q.value,scientific = FALSE)
+                    > 0.01,'*', ifelse(format(data.m$q.value,scientific = 
+                    FALSE) <= 0.01 & format(data.m$q.value,scientific = FALSE) 
+                    > 0.001,'**', ifelse(format(data.m$q.value,scientific = 
+                    FALSE) <= 0.001 , '***','NS'))))
             sg<-rep(sign(data.m2$value[data.m2$variable=='Case']-
             data.m2$value[data.m2$variable=='Control']),2)
             data.m2$Sign<-sg
@@ -3149,13 +3126,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -3171,7 +3146,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -3191,13 +3165,11 @@ server <- function(input, output, session) {
                 family = "',input$Plot_font,'",
                 size = ',input$Font_size1,',
                 color = "gray25") +
-                #---- nomes nos eixos, titulos, etc
                 labs( x = "Expression",
                 y = "Probe_Gene_ID",
                 title = "Gene Expression Between Case and Control",
                 subtitle = paste0("',input$gol,'"," ",term),
                 caption = "Control= arrow back ; Case: arrow point") +
-                # ----- Tema
                 theme_bw() +
                 theme(text = element_text(
                 family = "',input$Plot_font,'", color = "gray25"),
@@ -3213,7 +3185,6 @@ server <- function(input, output, session) {
                 ',face = "',input$font_face3,'"),
                 legend.title=element_text(size=',input$Font_size3,'),
                 legend.text=element_text(size=',input$Font_size3,'))  +
-                # --- adicionando limites para a coordenada x
                 coord_cartesian(xlim = c(min(data.m2$value)-0.7,
                 max(data.m2$value)+0.7)) +
                 scale_color_manual(
@@ -3254,7 +3225,7 @@ server <- function(input, output, session) {
                     rv$gg
                 })
             }
-    if (TRUE %in% ('try-error' %in% class(try(eval(parse(text=rv$ggt2)))))) {
+    if ((inherits(try(eval(parse(text=rv$ggt2))[1]),'try-error'))) {
         shinyjs::disabled('fplot')
     }
         else{
@@ -3280,7 +3251,6 @@ server <- function(input, output, session) {
         content = function(file) {
         postscript(file,family = input$Plot_font)
         print(final_plot())
-        #ggsave(file, plot = final_plot(), device = "eps")
         dev.off()
         })
 

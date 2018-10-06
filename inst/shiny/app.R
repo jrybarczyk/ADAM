@@ -249,7 +249,7 @@ server <- function(input, output, session) {
                                    file contains more than 50 rows)')
                         }
                             else{
-                                if (class(input_file_dt)=='try-error') {
+                                if (inherits((input_file_dt),'try-error')) {
                                     return('The uploaded file is
                                            incompatible with the selected
                                            separator type. Please select
@@ -1254,7 +1254,7 @@ server <- function(input, output, session) {
         output[['myplot']]<-renderPlot({
         rv$final_graph
         })
-    if (class(try(eval(parse(text=rv$final_graph_text))))!='try-error') {
+    if (!(inherits(try(eval(parse(text=rv$final_graph_text))),'try-error'))) {
         shinyjs::enable('Download_Plot_Buttom')
     }
         else{
