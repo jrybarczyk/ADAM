@@ -17,28 +17,29 @@ vignette: >
 
 # Overview
 *ADAM* is a GSEA R package created to group a set of genes from 
-comparative samples (control *versus* experiment) belonging to different species
-according to their respective functions (Gene Ontology and KEGG pathways 
-as default) and show their significance by calculating p-values referring to
-gene diversity and activity (@Castro2009). Each group of genes is called GFAG
-(Group of Functionally Associated Genes). 
+comparative samples (control *versus* experiment) belonging to different
+species according to their respective functions (Gene Ontology and KEGG 
+pathways as default) and show their significance by calculating p-values
+referring to gene diversity and activity (@Castro2009). Each group of genes is
+called GFAG (Group of Functionally Associated Genes). 
 
-The package presents two classes of functions: statistical and graphical. In the
-statistical class, all genes present in the expression data are 
+The package presents two classes of functions: statistical and graphical. In
+the statistical class, all genes present in the expression data are 
 grouped by their respective functions according to the domains described by 
 AnalysisDomain argument. The relationship between genes and functions are made
 based on the species annotation package. If there is no annotation package, 
 a three column file (gene, function and function description) must be provided.
-For each GFAG, gene diversity and activity in each sample are calculated. As the
-package allways compare two samples (control *versus* experiment), relative gene
-diversity and activity for each GFAG are calculated. Using bootstrap method,
-for each GFAG, according to relative gene diversity and activity, two p-values
-are calculated. The p-values are then corrected, according to the correction
-method defined by PCorrectionMethod argument, generating a q-value (@molan2018). 
-The significative GFAGs will be those whose q-value stay under the cutoff set
-by PCorrection argument. Optionally, it's possible to run Wilcoxon test and/or 
-Fisher's exact test (@fontoura2016). These tests also provide a corrected
-p-value, and siginificative groups can be seen through them.
+For each GFAG, gene diversity and activity in each sample are calculated. As
+the package allways compare two samples (control *versus* experiment), relative
+gene diversity and activity for each GFAG are calculated. Using bootstrap 
+method, for each GFAG, according to relative gene diversity and activity, two 
+p-values are calculated. The p-values are then corrected, according to the 
+correction method defined by PCorrectionMethod argument, generating a q-value 
+(@molan2018). The significative GFAGs will be those whose q-value stay under 
+the cutoff set by PCorrection argument. Optionally, it's possible to run 
+Wilcoxon test and/or Fisher's exact test (@fontoura2016). These tests also
+provide a corrected p-value, and siginificative groups can be seen through 
+them.
 
 In the graphical class, the outputs of the statistical functions can be studied
 through different plots. It's possible, for example, to choose a specific GFAG
@@ -80,7 +81,8 @@ Maximum <- 1000L
 
 The p-values for each GFAG is calculated through the bootstrap method, which
 demands a seed for generating random numbers and a number of bootstraps steps
-(the number of bootstraps should be a value that ensures the p-value precision):
+(the number of bootstraps should be a value that ensures the p-value 
+precision):
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
 SeedBootstrap <- 1049
@@ -164,8 +166,8 @@ term, KEGG pathway or one according to users annotations).</div>
 GFAG.</div> 
 * <div style="text-align: justify"> **Raw_Number_Genes** -  </div>
 * <div style="text-align: justify"> **Sample_Number_Genes** -  </div> 
-* <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity of
-each sample (control *versus* experiment).</div> 
+* <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity
+of each sample (control *versus* experiment).</div> 
 * <div style="text-align: justify"> **N_** - Two columns. GFAG gene activity of
 each sample (control *versus* experiment).</div> 
 * <div style="text-align: justify"> **h** - Relative gene diversity. </div> 
@@ -261,7 +263,7 @@ Nomenclature <- "symbol" #The nomenclature in the example is symbol
 
 As all arguments were defined, then we can run ADAnalysis function:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=FALSE, fig.height=6, fig.width=6}
 ResultAnalysis <- suppressMessages(ADAnalysis(ComparisonID = Comparison, 
                             ExpressionData = ExpressionHs,
                             MinGene = Minimum,
@@ -276,7 +278,7 @@ showing messages during the *ADAnalysis* function execution. The output of
 *ADAnalysis* will be a *list* with two elements. The first corresponds to a
 *data.frame* showing genes and their respective functions:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=FALSE, fig.height=6, fig.width=6}
 head(ResultAnalysis[[1]])
 ```
 
@@ -296,8 +298,8 @@ term, KEGG pathway or one according to users annotations).</div>
 GFAG.</div> 
 * <div style="text-align: justify"> **Raw_Number_Genes** -  </div>
 * <div style="text-align: justify"> **Sample_Number_Genes** -  </div> 
-* <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity of
-each sample (control *versus* experiment).</div> 
+* <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity
+of each sample (control *versus* experiment).</div> 
 * <div style="text-align: justify"> **N_** - Two columns. GFAG gene activity of
 each sample (control *versus* experiment).</div> 
 * <div style="text-align: justify"> **h** - Relative gene diversity. </div> 
@@ -306,18 +308,18 @@ each sample (control *versus* experiment).</div>
 # Graphical User Interface (GUI)
 The ADAM package contains 2 graphical modules for visualization and analysis of 
 the GFAGAnalysis output file. These modules are shiny-generated (GUI)s that
-allows the user to create and download plots in \*.eps format. The functions that
-launches those applications are: GFAGpathUi() and GFAGtargetUi(). The sections
-bellow contains more information about both applications.
+allows the user to create and download plots in \*.eps format. The functions 
+that launches those applications are: GFAGpathUi() and GFAGtargetUi(). 
+The sections bellow contains more information about both applications.
 
 ## GFAG Path Viewer Function: GFAGpathUi()
 'Paths' are essentially group names that contains the targets (eg: Gene
 Ontologies and KEGG are paths while genes and proteins related to them 
 are targets). The GFAGAnalysis output file contains information about the paths
 that the user utilized in the analysis and the GFAGpathUi() is a function that
-launches a shiny based (GUI) that can construct heatmaps for q-values present in
-the GFAGAnalysis output file. Bellow there is the layout of an usage example of
-the application with the GFAGAnalysis output file created with the first 10
+launches a shiny based (GUI) that can construct heatmaps for q-values present
+in the GFAGAnalysis output file. Bellow there is the layout of an usage example
+of the application with the GFAGAnalysis output file created with the first 10
 entries of the *Aedes Aegypt* data used in the statistical modules. 
 
 To generate the input file 'ResultAnalysisAedes.txt' use the commands on R 
@@ -334,7 +336,8 @@ write.table(dt,'ResultAnalysisAedes.txt',sep='\t',quote = F,
     row.names = F,col.names = T)
 ```
 
-Now launch the app, it can be launched in local machine or your default browser:
+Now launch the app, it can be launched in local machine or your default
+browser:
 
 ```{r eval=FALSE, fig.height=6, fig.width=6}
 library(ADAM)
@@ -418,9 +421,9 @@ this allows the user to select a column to be renamed. Note that renaming
 columns is purely optional!.</div>
 
 *  <div style="text-align: justify"> **16** -
-**Tab 3: Write a name for the selected column** - Disabled until you hit **14**,
-this allows the user to input a new name for the column selected in **15**.
-Note that renaming columns is purely optional!.</div>
+**Tab 3: Write a name for the selected column** - Disabled until you hit 
+**14**, this allows the user to input a new name for the column selected 
+in **15**. Note that renaming columns is purely optional!.</div>
 
 *  <div style="text-align: justify"> **17** -
 **Tab 3: Rename Button** - Disabled until you hit 
@@ -510,9 +513,9 @@ plot in .eps format. Disabled as long as there is no plot displayed.</div>
 This application was made to further analyse the GFAGs in the GFAGAnalysis
 output file. These paths can have many targets (genes, proteins) and this
 application constructs a plot that show the differential expression of the
-targets in a selected Path. The user needs to input 4 files in order to use this
-application: the GFAGAnalysis output file, an expression file, a Path-to-Target 
-relationship file and a differential expression file.
+targets in a selected Path. The user needs to input 4 files in order to use
+this application: the GFAGAnalysis output file, an expression file, a 
+Path-to-Target relationship file and a differential expression file.
 
 Bellow there is the layout of an usage example of the application with the
 GFAGAnalysis output file of the *Aedes Aegypt* data used in the
@@ -578,8 +581,8 @@ where the user will choose the GFAGAnalysis output file and consequentially
 the case as well.</div>
 
 *  <div style="text-align: justify"> **3** - 
-**Tab 1: Target Expression Data** . This element is initially disabled, the user
-needs to correctly upload a GFAGAnalysis output file first to enable it.
+**Tab 1: Target Expression Data** . This element is initially disabled, the 
+user needs to correctly upload a GFAGAnalysis output file first to enable it.
 Here the user will choose the expression file that he used to generate the
 GFAG output file that was selected.</div>
 
@@ -676,8 +679,8 @@ logFC interval between -10 and 10. Used for filtering logFCs to plot.
 </div>
 
 *  <div style="text-align: justify"> **19** - 
-**Tab 3: Select font family for plot elements** - Select the desired font family
-for the plot's elements.
+**Tab 3: Select font family for plot elements** - Select the desired font 
+family for the plot's elements.
 </div>
 
 
