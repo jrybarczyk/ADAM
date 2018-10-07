@@ -89,6 +89,7 @@
 #' ##
 #' data(ExpressionAedes)
 #' data(KeggPathwaysAedes)
+#' \dontrun{
 #' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
 #' "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 3L,
 #' MaxGene = 1000L, SeedNumber = 1049, BootstrapNumber = 1000L,
@@ -100,13 +101,13 @@
 #' head(ResultAnalysis[[1]]) #Relation between genes and functions
 #' head(ResultAnalysis[[2]][1]) #Result comparison 1
 #' head(ResultAnalysis[[2]][2]) #Result comparison 2
-#' 
+#' }
 #' ##
 #' #Partial Analysis with Homo sapiens through ADAnalysis function
 #' #(there is an annotation package called org.Hs.eg.db)
 #' ##
-#' \dontrun{
 #' data(ExpressionHs)
+#' \dontrun{
 #' ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
 #' ExpressionData = ExpressionHs, MinGene = 3L, MaxGene = 1000L, 
 #' DBSpecies = "hs",
@@ -114,12 +115,13 @@
 #' 
 #' head(ResultAnalysis[[1]]) #Relation between genes and functions
 #' head(ResultAnalysis[[2]][1]) #Result comparison 1
-#'
+#'}
 #' ##
 #' #Complete Analysis with Homo sapiens through GFAGAnalysis function
 #' #(there is an annotation package called org.Hs.eg.db)
 #' ##
 #' data(ExpressionHs)
+#' \dontrun{
 #' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1"),
 #' ExpressionData = ExpressionHs, MinGene = 3L,
 #' MaxGene = 1000L, SeedNumber = 1049, BootstrapNumber = 1000L,
