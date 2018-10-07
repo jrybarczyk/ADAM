@@ -3,17 +3,19 @@
 \name{GeneFunctionAedes}
 \alias{GeneFunctionAedes}
 \title{Relation between Aedes aegypti genes and KEGG pathways}
-\format{A data.frame with 782 rows and 2 variables}
+\format{A data.frame with 34 rows and 2 variables}
 \description{
 A relation between the GFAGs present in ResultAnalysisAedes and
 their respective genes.
 }
 \examples{
+\dontrun{
 data(GeneFunctionAedes)
 }
+}
 \references{
-Molan, A. L. 2018. “Construction of a Tool for Multispecies Genic
-Functional Enrichment Analysis Among Comparative Samples.” Master’s thesis, 
-Institute of Biosciences of Botucatu – Univ. Estadual Paulista.
-http://hdl.handle.net/11449/157105.
+Molan, A. L. 2018. “Construction of a Tool for Multispecies
+Genic Functional Enrichment Analysis Among Comparative Samples.”
+Master’s thesis Institute of Biosciences of Botucatu – Univ. Estadual
+Paulista. http://hdl.handle.net/11449/157105.
 }

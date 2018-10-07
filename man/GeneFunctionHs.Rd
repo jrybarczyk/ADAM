@@ -3,13 +3,15 @@
 \name{GeneFunctionHs}
 \alias{GeneFunctionHs}
 \title{Relation between Homo sapiens genes and Cellular Components}
-\format{A data.frame with 43292 rows and 2 variables}
+\format{A data.frame with 39 rows and 2 variables}
 \description{
 A relation between the GFAGs present in ResultAnalysisHs and
 their respective genes.
 }
 \examples{
+\dontrun{
 data(GeneFunctionHs)
+}
 }
 \references{
 Seco, G. B. S. 2018. "Comparative analysis of methods of 

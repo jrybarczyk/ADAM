@@ -3,17 +3,19 @@
 \name{ResultAnalysisHs}
 \alias{ResultAnalysisHs}
 \title{Result from an example of ADAM Homo sapiens analysis}
-\format{A data.frame with 554 rows and 22 variables}
+\format{A data.frame with 5 rows and 22 variables}
 \description{
 Result from ADAM Homo sapiens analysis according to 
 ExpressionHs data.
 }
 \examples{
+\dontrun{
 data(ResultAnalysisHs)
 }
+}
 \references{
-Molan, A. L. 2018. “Construction of a Tool for Multispecies Genic
-Functional Enrichment Analysis Among Comparative Samples.” Master’s thesis, 
-Institute of Biosciences of Botucatu – Univ. Estadual Paulista.
-http://hdl.handle.net/11449/157105.
+Molan, A. L. 2018. “Construction of a Tool for Multispecies
+Genic Functional Enrichment Analysis Among Comparative Samples.”
+Master’s thesis Institute of Biosciences of Botucatu – Univ. Estadual
+Paulista. http://hdl.handle.net/11449/157105.
 }

@@ -3,13 +3,15 @@
 \name{ExpressionHs}
 \alias{ExpressionHs}
 \title{Homo sapiens microarray data expression}
-\format{A data.frame with 2000 rows and 5 variables}
+\format{A data.frame with 38 rows and 5 variables}
 \description{
 A sample fragment of gene expression from an RNA-seq experiment
 of Homo sapiens.
 }
 \examples{
+\dontrun{
 data(ExpressionHs)
+}
 }
 \references{
 UEHARA, T. et al. The japanese toxicogenomics project: 

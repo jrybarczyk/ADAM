@@ -3,13 +3,15 @@
 \name{DiffHs}
 \alias{DiffHs}
 \title{Homo sapiens microarray differential expression data example}
-\format{A data.frame with 1964 rows and 3 variables}
+\format{A data.frame with 38 rows and 3 variables}
 \description{
 A sample fragment of differential gene expression from a
 microarray experiment of Homo sapiens.
 }
 \examples{
+\dontrun{
 data(DiffHs)
+}
 }
 \references{
 UEHARA, T. et al. The japanese toxicogenomics project: 

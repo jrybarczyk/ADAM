@@ -13,18 +13,18 @@ ADAnalysis(ComparisonID, ExpressionData, MinGene, MaxGene,
 DBSpecies, AnalysisDomain, GeneIdentifier)
 }
 \arguments{
-\item{ComparisonID}{Sample comparisons identification. It must be a vector in
-wich each element corresponds to 2 sample columns from the expression data.
-The data sample columns in each element from the vector are comma separated. 
-The first one refers to the control sample, while the second refers to the 
-experiment.}
+\item{ComparisonID}{Sample comparisons identification. It must be a vector
+in wich each element corresponds to 2 sample columns from the expression 
+data. The data sample columns in each element from the vector are comma 
+separated. The first one refers to the control sample, while the second
+refers to the experiment.}
 
 \item{ExpressionData}{Gene expression data (microarray or RNA-seq, for
 example). It must be a data frame or a path for a text file tab separated
 containing at least 3 columns. First column mandatory corresponds to the 
-gene identification, according to GeneIdentifier argument. Second, third and
-the other columns correspond to the gene expression values realated to the
-genes in the first column and each of these columns correspond to a
+gene identification, according to GeneIdentifier argument. Second, third 
+and the other columns correspond to the gene expression values realated to 
+the genes in the first column and each of these columns correspond to a
 different sample (control versus experiment).}
 
 \item{MinGene}{Minimum number of genes per GFAG. It must be a positive
@@ -44,8 +44,8 @@ zero, used by bootstrap function generates p-values for each GFAG.}
 
 \item{DBSpecies}{A string corresponding to an OrgDb species package 
 according to AvailableDBSpecies list. If there is no annotation package,
-it's possible to use an own gene annotation file containing 3 columns: gene, 
-term annotation code and description of the term annotation.}
+it's possible to use an own gene annotation file containing 3 columns: 
+gene, term annotation code and description of the term annotation.}
 
 \item{PCorrectionMethod}{Method p-value correction: holm, hochberg, hommel,
 bonferroni, bh, by or fdr (default is "fdr").}
@@ -57,15 +57,15 @@ Wilcoxon test (TRUE for performing and FALSE for not performing).}
 Fisher's exact test (TRUE for performing and FALSE for not performing).}
 
 \item{AnalysisDomain}{Analysis domain to be considered for building GFAGs, 
-according: gobp (Gene Ontology - Biological Processes), gocc (Gene Ontology -
-Celular Components), gomf (Gene Ontology - Molecular Functions), kegg (KEGG
-Pathways) or own (if there is no annotation package - the annotations were 
-defined in a file by user).}
+according: gobp (Gene Ontology - Biological Processes), gocc (Gene Ontology
+ - Celular Components), gomf (Gene Ontology - Molecular Functions), kegg
+(KEGG Pathways) or own (if there is no annotation package - the annotations 
+were defined in a file by user).}
 
 \item{GeneIdentifier}{Gene nomenclature to be used: symbol, entrez, tair
 (for Arabdopsis thaliana) or orf (for Saccharomyces cerevisiae or 
-Plasmodium falciparum). If there is no annotation package, just put the gene
-nomenclature present in the user's (own) annotations.}
+Plasmodium falciparum). If there is no annotation package, just put the 
+gene nomenclature present in the user's (own) annotations.}
 }
 \value{
 Return a list with two elements. The first one refers to a 
@@ -87,17 +87,17 @@ package, a three column file (gene, function and function description) must
 be provided. For each GFAG, gene diversity and activity in each sample are 
 calculated. As the package allways compare two samples (control versus 
 experiment), relative gene diversity and activity for each GFAG are
-calculated. Using bootstrap method, for each GFAG, according to relative gene
-diversity and activity, two p-values are calculated. The p-values are then
-corrected, according to the correction method defined by PCorrectionMethod
-argument, generating a q-value. The significative GFAGs will be those whoose
-q-value stay under the cutoff set by PCorrection argument. Optionally, it's
-possible to run Wilcoxon test and/or Fisher's exact test. These tests also
-provide a corrected p-value, and siginificative groups can be seen through
-them. GFAGAnalysis function allows to run a complete analysis, using all 
-available arguments. ADAnalysis function allows to run a partial analysis,
-where is calculated just gene diversity and activity of each GFAG with no 
-signicance by bootrstrap, Wilcoxon or Fisher.
+calculated. Using bootstrap method, for each GFAG, according to relative 
+gene diversity and activity, two p-values are calculated. The p-values are 
+then corrected, according to the correction method defined by 
+PCorrectionMethod argument, generating a q-value. The significative GFAGs 
+will be those whoose q-value stay under the cutoff set by PCorrection 
+argument. Optionally, it's possible to run Wilcoxon test and/or Fisher's
+exact test. These tests also provide a corrected p-value, and siginificative
+groups can be seen through them. GFAGAnalysis function allows to run a
+complete analysis, using all available arguments. ADAnalysis function allows
+to run a partial analysis, where is calculated just gene diversity and 
+activity of each GFAG with no signicance by bootrstrap, Wilcoxon or Fisher.
 }
 \examples{
 ##
@@ -105,10 +105,11 @@ signicance by bootrstrap, Wilcoxon or Fisher.
 #(there is no annotation package)
 ##
 data(ExpressionAedes)
+\dontrun{
 data(KeggPathwaysAedes)
 ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
 "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 3L,
-MaxGene = 1000L, SeedNumber = 1049, BootstrapNumber = 10000L,
+MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 100L,
 PCorrection = 0.05, DBSpecies = KeggPathwaysAedes, 
 PCorrectionMethod = "fdr",
 WilcoxonTest = TRUE, FisherTest = TRUE, AnalysisDomain = "own", 
@@ -119,33 +120,18 @@ head(ResultAnalysis[[2]][1]) #Result comparison 1
 head(ResultAnalysis[[2]][2]) #Result comparison 2
 
 ##
-#Complete Analysis with Homo sapiens through GFAGAnalysis function
-#(there is an annotation package called org.Hs.eg.db)
-##
-data(ExpressionHs)
-ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1"),
-ExpressionData = ExpressionHs, MinGene = 3L,
-MaxGene = 1000L, SeedNumber = 1049, BootstrapNumber = 1000L,
-PCorrection = 0.05, DBSpecies = "hs", 
-PCorrectionMethod = "fdr",
-WilcoxonTest = FALSE, FisherTest = FALSE, AnalysisDomain = "gocc", 
-GeneIdentifier = "symbol")
-
-head(ResultAnalysis[[1]]) #Relation between genes and functions
-head(ResultAnalysis[[2]][1]) #Result comparison 1
-
-##
 #Partial Analysis with Homo sapiens through ADAnalysis function
 #(there is an annotation package called org.Hs.eg.db)
 ##
 data(ExpressionHs)
 ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
-ExpressionData = ExpressionHs, MinGene = 3L, MaxGene = 1000L, 
+ExpressionData = ExpressionHs, MinGene = 3L, MaxGene = 20L, 
 DBSpecies = "hs",
 AnalysisDomain = "gocc", GeneIdentifier = "symbol")
 
 head(ResultAnalysis[[1]]) #Relation between genes and functions
 head(ResultAnalysis[[2]][1]) #Result comparison 1
+}
 }
 \references{
 CASTRO, M. A., RYBARCZYK-FILHO, J. L., et al. Viacomplex:

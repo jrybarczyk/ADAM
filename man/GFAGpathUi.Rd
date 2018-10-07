@@ -27,10 +27,10 @@ paths but the graphs tend to get rather long.
 \examples{
 #Creating input files
 data(DiffAedes)
+\dontrun{
 data(ExpressionAedes)
 data(GeneFunctionAedes)
 data(ResultAnalysisAedes)
-\dontrun{
 #Input file 1
 write.table(DiffAedes,file = "DiffAedes.txt",sep = "\\t", col.names = TRUE,
 row.names = FALSE, quote = FALSE)

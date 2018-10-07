@@ -26,10 +26,10 @@ See the vignette for more information.
 \examples{
 #Creating input files
 data(DiffHs)
+\dontrun{
 data(ExpressionHs)
 data(GeneFunctionHs)
 data(ResultAnalysisHs)
-\dontrun{
 #Input file 1
 write.table(DiffHs,file = "DiffHs.txt",sep = "\\t", col.names = TRUE,
 row.names = FALSE, quote = FALSE)
