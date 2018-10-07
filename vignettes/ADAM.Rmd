@@ -76,7 +76,7 @@ consider all GFAGs or just those with a certain number of genes:
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
 Minimum <- 10L
-Maximum <- 100L
+Maximum <- 20L
 ```
 
 The p-values for each GFAG is calculated through the bootstrap method, which
@@ -101,7 +101,7 @@ In order to group the genes according to their functions, it's necessary an
 annotation package or a file relating genes and functions. In this case, *Aedes
 aegypti* doesn't have an annotation package. This way, we build our own file:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=FALSE, fig.height=6, fig.width=6}
 data("KeggPathwaysAedes")
 head(KeggPathwaysAedes)
 ```
@@ -124,7 +124,7 @@ Nomenclature <- FALSE
 
 As all arguments were defined, then we can run GFAGAnalysis function:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=FALSE, fig.height=6, fig.width=6}
 ResultAnalysis <- suppressMessages(GFAGAnalysis(ComparisonID = Comparison, 
                             ExpressionData = ExpressionAedes,
                             MinGene = Minimum,
@@ -145,7 +145,7 @@ showing messages during the *GFAGAnalysis* function execution. The output of
 *GFAGAnalysis* will be a *list* with two elements. The first corresponds to a
 *data.frame* showing genes and their respective functions:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=FALSE, fig.height=6, fig.width=6}
 head(ResultAnalysis[[1]])
 ```
 
