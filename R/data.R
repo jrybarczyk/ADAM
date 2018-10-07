@@ -13,7 +13,7 @@ NULL
 #' @title Aedes aegypti RNA-seq differential expression data example
 #' @description  A sample fragment of differential gene expression from an
 #' RNA-seq experiment of Aedes aegypti mosquito.
-#' @format A data.frame with 1963 rows and 3 variables
+#' @format A data.frame with 71 rows and 3 variables
 #' @name DiffAedes
 #' @references AKBARI, O. S. et al. The developmental transcriptome of the 
 #' mosquito aedes aegypti, an invasive species and major arbovirus vector. 
@@ -26,7 +26,7 @@ NULL
 #' @title Homo sapiens microarray differential expression data example
 #' @description  A sample fragment of differential gene expression from a
 #' microarray experiment of Homo sapiens.
-#' @format A data.frame with 1964 rows and 3 variables
+#' @format A data.frame with 76 rows and 3 variables
 #' @name DiffHs
 #' @references UEHARA, T. et al. The japanese toxicogenomics project: 
 #' application of toxicogenomics. Molecular nutrition & food research, 
@@ -38,7 +38,7 @@ NULL
 #' @title Aedes aegypti RNA-seq data expression
 #' @description A sample fragment of gene expression from an RNA-seq experiment
 #' of Aedes aegypti mosquito.
-#' @format A data.frame with 2000 rows and 5 variables
+#' @format A data.frame with 73 rows and 5 variables
 #' @name ExpressionAedes
 #' @references AKBARI, O. S. et al. The developmental transcriptome of the 
 #' mosquito aedes aegypti, an invasive species and major arbovirus vector. G3:
@@ -51,7 +51,7 @@ NULL
 #' @title Homo sapiens microarray data expression
 #' @description A sample fragment of gene expression from an RNA-seq experiment
 #' of Homo sapiens.
-#' @format A data.frame with 2000 rows and 5 variables
+#' @format A data.frame with 76 rows and 5 variables
 #' @name ExpressionHs
 #' @references UEHARA, T. et al. The japanese toxicogenomics project: 
 #' application of toxicogenomics. Molecular nutrition & food research, 
@@ -63,7 +63,7 @@ NULL
 #' @title Relation between Aedes aegypti genes and KEGG pathways
 #' @description A relation between the GFAGs present in ResultAnalysisAedes and
 #' their respective genes.
-#' @format A data.frame with 782 rows and 2 variables
+#' @format A data.frame with 74 rows and 2 variables
 #' @name GeneFunctionAedes
 #' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
 #' Genic Functional Enrichment Analysis Among Comparative Samples.”
@@ -78,7 +78,7 @@ NULL
 #' @title Relation between Homo sapiens genes and Cellular Components
 #' @description A relation between the GFAGs present in ResultAnalysisHs and
 #' their respective genes.
-#' @format A data.frame with 43292 rows and 2 variables
+#' @format A data.frame with 76 rows and 2 variables
 #' @name GeneFunctionHs
 #' @references Seco, G. B. S. 2018. "Comparative analysis of methods of 
 #' determination of altered biological pathways in toxicogenomic data of in 
@@ -94,7 +94,7 @@ NULL
 #' ADAM input
 #' @description A relation between the genes in the ExpressionAedes data and
 #' their respective KEGG pathways (GFAGs).
-#' @format A data.frame with 782 rows and 2 variables
+#' @format A data.frame with 355 rows and 2 variables
 #' @name KeggPathwaysAedes
 #' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
 #' Genic Functional Enrichment Analysis Among Comparative Samples.”
@@ -109,7 +109,7 @@ NULL
 #' @title Result from an example of ADAM Aedes aegypti analysis
 #' @description Result from ADAM Aedes aegypti analysis according to 
 #' ExpressionAedes data.
-#' @format A data.frame with 87 rows and 22 variables
+#' @format A data.frame with 10 rows and 22 variables
 #' @name ResultAnalysisAedes
 #' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
 #' Genic Functional Enrichment Analysis Among Comparative Samples.”
@@ -122,7 +122,7 @@ NULL
 #' @title Result from an example of ADAM Homo sapiens analysis
 #' @description Result from ADAM Homo sapiens analysis according to 
 #' ExpressionHs data.
-#' @format A data.frame with 554 rows and 22 variables
+#' @format A data.frame with 10 rows and 22 variables
 #' @name ResultAnalysisHs
 #' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
 #' Genic Functional Enrichment Analysis Among Comparative Samples.”
