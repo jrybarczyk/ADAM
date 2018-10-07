@@ -87,8 +87,8 @@
 #' #Complete Analysis with Aedes aetypti through GFAGAnalysis function
 #' #(there is no annotation package)
 #' ##
-#' data(KeggPathwaysAedes)
 #' \dontrun{
+#' data(KeggPathwaysAedes)
 #' data(ExpressionAedes)
 #' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
 #' "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 10L,
