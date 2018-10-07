@@ -75,7 +75,7 @@ Each GFAG has a number of genes associated to it. This way, the analysis can
 consider all GFAGs or just those with a certain number of genes:
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
-Minimum <- 10L
+Minimum <- 3L
 Maximum <- 20L
 ```
 
@@ -86,7 +86,7 @@ precision):
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
 SeedBootstrap <- 1049
-StepsBootstrap <- 1000L
+StepsBootstrap <- 10000L
 ```
 
 The p-values will be corrected by a specific method with a certain cutoff 
@@ -101,7 +101,7 @@ In order to group the genes according to their functions, it's necessary an
 annotation package or a file relating genes and functions. In this case, *Aedes
 aegypti* doesn't have an annotation package. This way, we build our own file:
 
-```{r eval=FALSE, fig.height=6, fig.width=6}
+```{r eval=TRUE, fig.height=6, fig.width=6}
 data("KeggPathwaysAedes")
 head(KeggPathwaysAedes)
 ```
@@ -115,11 +115,11 @@ Domain <- "own"
 Nomenclature <- "gene"
 ```
 
-Wilcoxon test and Fisher's exact test will not be run:
+Wilcoxon test and Fisher's exact test will be run:
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
-Wilcoxon <- FALSE
-Nomenclature <- FALSE
+Wilcoxon <- TRUE
+Nomenclature <- TRUE
 ```
 
 As all arguments were defined, then we can run GFAGAnalysis function:
@@ -233,7 +233,7 @@ Each GFAG has a number of genes associated to it. This way, the analysis can
 consider all GFAGs or just those with a certain number of genes:
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
-Minimum <- 10L
+Minimum <- 3L
 Maximum <- 100L
 ```
 
