@@ -6,7 +6,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericMatrix MakeBootstrap(NumericMatrix BootstrapData, int BootstrapNumber, 
                             int BootstrapGroupSize, double BootstrapSeed) {
-    int nrow = BootstrapData.nrow(), ncol = BootstrapData.ncol(), k = 0;
+    int k = 0;
     int StartRow = 0;
     double SumExperiment=0, SumControl=0, pExperiment = 0, pControl = 0;
     double HControl=0, HExperiment=0, h=0, n=0;
