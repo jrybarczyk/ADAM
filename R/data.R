@@ -129,5 +129,7 @@ NULL
 #' Master’s thesis Institute of Biosciences of Botucatu – Univ. Estadual
 #' Paulista. http://hdl.handle.net/11449/157105.
 #' @examples 
+#' \dontrun{
 #' data(ResultAnalysisHs)
+#' }
 NULL
