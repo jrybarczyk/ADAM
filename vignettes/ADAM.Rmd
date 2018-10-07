@@ -75,8 +75,8 @@ Each GFAG has a number of genes associated to it. This way, the analysis can
 consider all GFAGs or just those with a certain number of genes:
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
-Minimum <- 3L
-Maximum <- 1000L
+Minimum <- 10L
+Maximum <- 100L
 ```
 
 The p-values for each GFAG is calculated through the bootstrap method, which
@@ -86,7 +86,7 @@ precision):
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
 SeedBootstrap <- 1049
-StepsBootstrap <- 10000L
+StepsBootstrap <- 1000L
 ```
 
 The p-values will be corrected by a specific method with a certain cutoff 
@@ -115,11 +115,11 @@ Domain <- "own"
 Nomenclature <- "gene"
 ```
 
-Wilcoxon test and Fisher's exact test will also be run:
+Wilcoxon test and Fisher's exact test will not be run:
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
-Wilcoxon <- TRUE
-Nomenclature <- TRUE
+Wilcoxon <- FALSE
+Nomenclature <- FALSE
 ```
 
 As all arguments were defined, then we can run GFAGAnalysis function:
@@ -233,8 +233,8 @@ Each GFAG has a number of genes associated to it. This way, the analysis can
 consider all GFAGs or just those with a certain number of genes:
 
 ```{r eval=TRUE, fig.height=6, fig.width=6}
-Minimum <- 3L
-Maximum <- 1000L
+Minimum <- 10L
+Maximum <- 100L
 ```
 
 In order to group the genes according to their functions, it's necessary an
