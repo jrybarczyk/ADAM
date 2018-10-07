@@ -87,11 +87,11 @@
 #' #Complete Analysis with Aedes aetypti through GFAGAnalysis function
 #' #(there is no annotation package)
 #' ##
+#' data(ExpressionAedes)
 #' \dontrun{
 #' data(KeggPathwaysAedes)
-#' data(ExpressionAedes)
 #' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
-#' "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 10L,
+#' "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 3L,
 #' MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 100L,
 #' PCorrection = 0.05, DBSpecies = KeggPathwaysAedes, 
 #' PCorrectionMethod = "fdr",
@@ -108,25 +108,9 @@
 #' ##
 #' data(ExpressionHs)
 #' ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
-#' ExpressionData = ExpressionHs, MinGene = 10L, MaxGene = 20L, 
+#' ExpressionData = ExpressionHs, MinGene = 3L, MaxGene = 20L, 
 #' DBSpecies = "hs",
 #' AnalysisDomain = "gocc", GeneIdentifier = "symbol")
-#' 
-#' head(ResultAnalysis[[1]]) #Relation between genes and functions
-#' head(ResultAnalysis[[2]][1]) #Result comparison 1
-#'
-#' ##
-#' #Complete Analysis with Homo sapiens through GFAGAnalysis function
-#' #(there is an annotation package called org.Hs.eg.db)
-#' ##
-#' data(ExpressionHs)
-#' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1"),
-#' ExpressionData = ExpressionHs, MinGene = 10L,
-#' MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 100L,
-#' PCorrection = 0.05, DBSpecies = "hs", 
-#' PCorrectionMethod = "fdr",
-#' WilcoxonTest = FALSE, FisherTest = FALSE, AnalysisDomain = "gocc", 
-#' GeneIdentifier = "symbol")
 #' 
 #' head(ResultAnalysis[[1]]) #Relation between genes and functions
 #' head(ResultAnalysis[[2]][1]) #Result comparison 1

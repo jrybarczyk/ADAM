@@ -33,10 +33,10 @@
 #' @examples
 #' #Creating input files
 #' data(DiffHs)
+#' \dontrun{
 #' data(ExpressionHs)
 #' data(GeneFunctionHs)
 #' data(ResultAnalysisHs)
-#' \dontrun{
 #' #Input file 1
 #' write.table(DiffHs,file = "DiffHs.txt",sep = "\t", col.names = TRUE,
 #' row.names = FALSE, quote = FALSE)
@@ -52,7 +52,7 @@
 #' #Grahphical analysis
 #' GFAGtargetUi(browser = TRUE) # Launch the app in your default web browser.
 #' GFAGtargetUi(browser = FALSE) # Launch the app in your local machine.
-#' }
+#'}
 GFAGtargetUi <-function(browser){
     tryCatch({
         if (browser){
