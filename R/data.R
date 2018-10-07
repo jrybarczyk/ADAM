@@ -36,7 +36,7 @@ NULL
 NULL
 
 #' @title Aedes aegypti RNA-seq data expression
-#' @description  A sample fragment of gene expression from an RNA-seq experiment
+#' @description A sample fragment of gene expression from an RNA-seq experiment
 #' of Aedes aegypti mosquito.
 #' @format A data.frame with 2000 rows and 5 variables
 #' @name ExpressionAedes
@@ -49,7 +49,7 @@ NULL
 NULL
 
 #' @title Homo sapiens microarray data expression
-#' @description  A sample fragment of gene expression from an RNA-seq experiment
+#' @description A sample fragment of gene expression from an RNA-seq experiment
 #' of Homo sapiens.
 #' @format A data.frame with 2000 rows and 5 variables
 #' @name ExpressionHs
@@ -65,12 +65,14 @@ NULL
 #' their respective genes.
 #' @format A data.frame with 782 rows and 2 variables
 #' @name GeneFunctionAedes
-#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies Genic
-#' Functional Enrichment Analysis Among Comparative Samples.” Master’s thesis, 
-#' Institute of Biosciences of Botucatu – Univ. Estadual Paulista.
-#' http://hdl.handle.net/11449/157105.
+#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
+#' Genic Functional Enrichment Analysis Among Comparative Samples.”
+#' Master’s thesis Institute of Biosciences of Botucatu – Univ. Estadual
+#' Paulista. http://hdl.handle.net/11449/157105.
 #' @examples 
+#' \dontrun{
 #' data(GeneFunctionAedes)
+#' }
 NULL
 
 #' @title Relation between Homo sapiens genes and Cellular Components
@@ -83,7 +85,9 @@ NULL
 #' vitro and in vivo studies." Master’s thesis, Institute of Biosciences of
 #' Botucatu – Univ. Estadual Paulista. http://hdl.handle.net/11449/157078
 #' @examples 
+#' \dontrun{
 #' data(GeneFunctionHs)
+#' }
 NULL
 
 #' @title Relation between Aedes aegypti genes and KEGG pathways as 
@@ -92,12 +96,14 @@ NULL
 #' their respective KEGG pathways (GFAGs).
 #' @format A data.frame with 782 rows and 2 variables
 #' @name KeggPathwaysAedes
-#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies Genic
-#' Functional Enrichment Analysis Among Comparative Samples.” Master’s thesis, 
-#' Institute of Biosciences of Botucatu – Univ. Estadual Paulista.
-#' http://hdl.handle.net/11449/157105.
+#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
+#' Genic Functional Enrichment Analysis Among Comparative Samples.”
+#' Master’s thesis Institute of Biosciences of Botucatu – Univ. Estadual
+#' Paulista. http://hdl.handle.net/11449/157105.
 #' @examples
+#' \dontrun{
 #' data(KeggPathwaysAedes)
+#' }
 NULL
 
 #' @title Result from an example of ADAM Aedes aegypti analysis
@@ -105,10 +111,10 @@ NULL
 #' ExpressionAedes data.
 #' @format A data.frame with 87 rows and 22 variables
 #' @name ResultAnalysisAedes
-#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies Genic
-#' Functional Enrichment Analysis Among Comparative Samples.” Master’s thesis, 
-#' Institute of Biosciences of Botucatu – Univ. Estadual Paulista.
-#' http://hdl.handle.net/11449/157105.
+#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
+#' Genic Functional Enrichment Analysis Among Comparative Samples.”
+#' Master’s thesis Institute of Biosciences of Botucatu – Univ. Estadual
+#' Paulista. http://hdl.handle.net/11449/157105.
 #' @examples
 #' data(ResultAnalysisAedes)
 NULL
@@ -118,10 +124,10 @@ NULL
 #' ExpressionHs data.
 #' @format A data.frame with 554 rows and 22 variables
 #' @name ResultAnalysisHs
-#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies Genic
-#' Functional Enrichment Analysis Among Comparative Samples.” Master’s thesis, 
-#' Institute of Biosciences of Botucatu – Univ. Estadual Paulista.
-#' http://hdl.handle.net/11449/157105.
+#' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
+#' Genic Functional Enrichment Analysis Among Comparative Samples.”
+#' Master’s thesis Institute of Biosciences of Botucatu – Univ. Estadual
+#' Paulista. http://hdl.handle.net/11449/157105.
 #' @examples 
 #' data(ResultAnalysisHs)
 NULL
