@@ -4,15 +4,13 @@
 \alias{KeggPathwaysAedes}
 \title{Relation between Aedes aegypti genes and KEGG pathways as 
 ADAM input}
-\format{A data.frame with 200 rows and 2 variables}
+\format{A data frame with 200 rows and 2 variables}
 \description{
 A relation between the genes in the ExpressionAedes data and
 their respective KEGG pathways (GFAGs).
 }
 \examples{
-\dontrun{
 data(KeggPathwaysAedes)
-}
 }
 \references{
 Molan, A. L. 2018. “Construction of a Tool for Multispecies
