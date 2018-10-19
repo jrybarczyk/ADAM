@@ -1,7 +1,7 @@
 ############
 #Arguments checking and object building
 ############
-ECGPreprocess <- function(ComparisonID,
+ECGMainData <- function(ComparisonID,
                         ExpressionData,
                         MinGene,
                         MaxGene,
@@ -22,7 +22,7 @@ ECGPreprocess <- function(ComparisonID,
     #according to GeneIdentifier argument. Second, third and the
     #others correspond to the gene samples expression.
     if(!missing(ExpressionData)){
-        GeneExpressionData <- checkExpressionData(ExpressionData)
+        GeneExpressionData <- .checkExpressionData(ExpressionData)
     }else{
         stop("Please inform a valid expression data!")
     }
@@ -32,7 +32,7 @@ ECGPreprocess <- function(ComparisonID,
     #the expression data. The data sample columns in each element from the
     #vector are comma separated.
     if(!missing(ComparisonID)){
-        ComparisonID <- checkComparisonID(ComparisonID,GeneExpressionData)
+        ComparisonID <- .checkComparisonID(ComparisonID,GeneExpressionData)
     }else{
         stop("Please inform a valid comparison ID!")
     }
@@ -42,15 +42,15 @@ ECGPreprocess <- function(ComparisonID,
     #positive values and different from zero. Besides, the argument MaxGene 
     #must be allways greater than MinGene.
     if(!missing(MinGene) & !missing(MaxGene)){
-        GeneNumbers <- checkGeneNumbers(MinGene,MaxGene)
+        GeneNumbers <- .checkGeneNumbers(MinGene,MaxGene)
         InfGeneLimit <- GeneNumbers[1]
         SupGeneLimit <- GeneNumbers[2]
     }
     if(missing(MinGene)){
-        InfGeneLimit <- as.integer(3)
+        InfGeneLimit <- 3
     }
     if(missing(MaxGene)){
-        SupGeneLimit <- as.integer(2000)
+        SupGeneLimit <- 2000
     }
 
     #Check the domain analysis, species reference database and gene identifier.
@@ -64,9 +64,8 @@ ECGPreprocess <- function(ComparisonID,
     #the nomenclature to be used (symbol or entrez).
     if(!missing(AnalysisDomain) & !missing(DBSpecies) & 
         !missing(GeneIdentifier)){
-        Analysis <- checkAnalysisDomain_DBSpecies_GeneIdentifier(x = 
-                    AnalysisDomain, y = DBSpecies, z = GeneIdentifier,
-                    k = ExpressionData)
+        Analysis<-.checkAnalysisDomain_DBSpecies_GeneIdentifier(AnalysisDomain,
+                    DBSpecies,GeneIdentifier,GeneExpressionData)
         DomainGroup <- Analysis[[1]]
         DataSpeciesFunctionsSample <- Analysis[[2]]
         DataSpeciesFunctionsRaw <- Analysis[[3]]
@@ -87,25 +86,25 @@ ECGPreprocess <- function(ComparisonID,
         #must be a numeric value allways positive, greater than or
         #equal to zero.
         if(!missing(SeedNumber)){
-            SeedNumber <- checkSeedNumber(SeedNumber)
+            SeedNumber <- .checkSeedNumber(SeedNumber)
         }else{
-            SeedNumber <- as.integer(10049)
+            SeedNumber <- 10049
         }
         
         #Check the number of bootstraps necessary for defining GFAG p-values.
         #The argument BootstrapNumber must be an integer number
         #greater than zero.
         if(!missing(BootstrapNumber)){
-            BootstrapNumber <- checkBootstrapNumber(BootstrapNumber)
+            BootstrapNumber <- .checkBootstrapNumber(BootstrapNumber)
         }else{
-            BootstrapNumber <- as.integer(10000)
+            BootstrapNumber <- 1000
         }
         
         #Check the cutoff to be used for one of the p-value correction methods. 
         #The PCorrection argument must be a numeric value between
         #zero and one.
         if(!missing(PCorrection)){
-            PCorrection <- checkPCorrection(PCorrection)
+            PCorrection <- .checkPCorrection(PCorrection)
         }else{
             PCorrection <- 0.05
         }
@@ -114,7 +113,7 @@ ECGPreprocess <- function(ComparisonID,
         #must be a character corresponding to one of the p.adjust function
         #correction methods (holm, hochberg, hommel, bonferroni, BH, BY, fdr).
         if(!missing(PCorrectionMethod)){
-            PCorrectionMethod <- checkPCorrectionMethod(PCorrectionMethod)
+            PCorrectionMethod <- .checkPCorrectionMethod(PCorrectionMethod)
         }else{
             PCorrectionMethod <- "fdr"
         }
@@ -123,7 +122,7 @@ ECGPreprocess <- function(ComparisonID,
         #WilcoxonTest argument should be TRUE for running the test or FALSE
         #if the test won't be performed.
         if(!missing(WilcoxonTest)){
-            WilcoxonTest <- checkWilcoxonTest(WilcoxonTest)
+            WilcoxonTest <- .checkWilcoxonTest(WilcoxonTest)
         }else{
             WilcoxonTest <- FALSE
         }
@@ -132,7 +131,7 @@ ECGPreprocess <- function(ComparisonID,
         #argument should be TRUE for running the test or FALSE
         #if the test won't be performed.
         if(!missing(FisherTest)){
-            FisherTest <- checkFisherTest(FisherTest)
+            FisherTest <- .checkFisherTest(FisherTest)
         }else{
             FisherTest <- FALSE
         }

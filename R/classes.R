@@ -13,3 +13,4 @@ setClass("ECGMainData",
                 FisherTest = "logical",
                 AnalysisDomain = "character",
                 GeneIdentifier = "character"))
+
