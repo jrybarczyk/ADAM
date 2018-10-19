@@ -1,7 +1,7 @@
 Package: ADAM
 Type: Package
 Title: ADAM: Activity and Diversity Analysis Module
-Version: 0.99.56
+Version: 0.99.57
 Date: 2018-10-5
 Author: André Luiz Molan <andre.molan@unesp.br>, Giordano Bruno Sanches Seco <giordano.bruno@unesp.br>, Agnes Alessandra Sekijima Takeda <agnes.takeda@unesp.br>, Jose Luiz Rybarczyk Filho <jose.luiz@unesp.br>
 Maintainer: Jose Luiz Rybarczyk Filho <jose.luiz@unesp.br>
