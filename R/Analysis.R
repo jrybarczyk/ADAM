@@ -6,7 +6,7 @@
 #' @import org.EcSakai.eg.db org.Gg.eg.db org.Hs.eg.db org.Mm.eg.db
 #' @import org.Mmu.eg.db org.Pf.plasmo.db org.Pt.eg.db org.Rn.eg.db
 #' @import org.Sc.sgd.db org.Ss.eg.db org.Xl.eg.db
-#' @import pbapply BiocManager methods
+#' @import pbapply BiocManager methods knitr
 #' @importFrom utils installed.packages
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats wilcox.test fisher.test
