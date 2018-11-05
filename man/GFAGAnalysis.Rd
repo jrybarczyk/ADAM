@@ -22,10 +22,11 @@ refers to the experiment.}
 \item{ExpressionData}{Gene expression data (microarray or RNA-seq, for
 example). It must be a SummarizedExperiment object, a data frame or a path
 for a text file tab separated containing at least 3 columns. First column 
-mandatory corresponds to the gene identification, according to GeneIdentifier
-argument. Second, third and the other columns correspond to the gene 
-expression values realated to the genes in the first column and each of 
-these columns correspond to a different sample (control versus experiment).}
+mandatory corresponds to the gene identification, according to 
+GeneIdentifier argument. Second, third and the other columns correspond to
+the gene expression values realated to the genes in the first column and
+each of these columns correspond to a different sample (control versus 
+experiment).}
 
 \item{MinGene}{Minimum number of genes per GFAG. It must be a positive
 integer value different from zero and lower than MaxGene argument.
@@ -39,14 +40,14 @@ Default is 2000.}
 for random number generating by bootstrap function. Default is 1049.}
 
 \item{BootstrapNumber}{Number of bootstraps. A numeric value greater than 
-zero, used by bootstrap function generates p-values for each GFAG. Default is
-1000.}
+zero, used by bootstrap function generates p-values for each GFAG. Default
+is 1000.}
 
 \item{PCorrection}{Cutoff for p-value correction. A numeric value between 
 0 and 1. Default is 0.05.}
 
-\item{DBSpecies}{A string corresponding to the name of an OrgDb species gene
-annotation package: org.Ag.eg.db (Anopheles gambiae), org.At.tair.db 
+\item{DBSpecies}{A string corresponding to the name of an OrgDb species 
+gene annotation package: org.Ag.eg.db (Anopheles gambiae), org.At.tair.db 
 (Arabdopsis thaliana), org.Bt.eg.db (Bos taurus), org.Ce.eg.db
 (Caenorhabditis elegans), org.Cf.eg.db (Canis familiaris), org.Dm.eg.db 
 (Drosophila melanogaster), org.Dr.eg.db (Danio rerio), org.EcK12.eg.db 
@@ -56,10 +57,10 @@ org.Gg.eg.db (Gallus gallus), org.Hs.eg.db (Homo sapiens), org.Mm.eg.db
 (Plasmodium falciparum), org.Pt.eg.db (Pan troglodytes), org.Rn.eg.db
 (Rattus norvegicus), org.Sc.sgd.db (Saccharomyces cerevisiae),
 org.Ss.eg.db (Sus scrofa) and org.Xl.eg.db (Xenopus laevis).
-If there is no package, it's possible for the user to create a personal gene
-annotation file, tab separated, containing 3 columns: gene, term annotation 
-code and description of the term annotation. So, istead of a string with an 
-OrgDb name, inform a data frame or a path for the file.}
+If there is no package, it's possible for the user to create a personal 
+gene annotation file, tab separated, containing 3 columns: gene, term 
+annotation code and description of the term annotation. So, istead of a 
+string with an OrgDb name, inform a data frame or a path for the file.}
 
 \item{PCorrectionMethod}{Method p-value correction: holm, hochberg, hommel,
 bonferroni, bh, by or fdr. Default is "fdr".}
@@ -109,11 +110,12 @@ then corrected, according to the correction method defined by
 PCorrectionMethod argument, generating a q-value. The significative GFAGs 
 will be those whoose q-value stay under the cutoff set by PCorrection 
 argument. Optionally, it's possible to run Wilcoxon test and/or Fisher's
-exact test. These tests also provide a corrected p-value, and siginificative
-groups can be seen through them. GFAGAnalysis function allows to run a
-complete analysis, using all available arguments. ADAnalysis function allows
-to run a partial analysis, where is calculated just gene diversity and 
-activity of each GFAG with no signicance by bootrstrap, Wilcoxon or Fisher.
+exact test. These tests also provide a corrected p-value, 
+and siginificative groups can be seen through them. GFAGAnalysis function 
+allows to run a complete analysis, using all available arguments. 
+ADAnalysis function allows to run a partial analysis, where is calculated
+just gene diversity and activity of each GFAG with no signicance by 
+bootrstrap, Wilcoxon or Fisher.
 }
 \examples{
 ##
@@ -124,9 +126,9 @@ data(KeggPathwaysAedes)
 ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
 "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 3L,
 MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 1000L,
-PCorrection = 0.05, DBSpecies = KeggPathwaysAedes, PCorrectionMethod = "fdr",
-WilcoxonTest = TRUE, FisherTest = TRUE, AnalysisDomain = "own", 
-GeneIdentifier = "gene")
+PCorrection = 0.05, DBSpecies = KeggPathwaysAedes,
+PCorrectionMethod = "fdr", WilcoxonTest = TRUE, FisherTest = TRUE,
+AnalysisDomain = "own", GeneIdentifier = "gene")
 \dontrun{
 head(ResultAnalysis[[1]]) #Relation between genes and functions
 head(ResultAnalysis[[2]][1]) #Result comparison 1

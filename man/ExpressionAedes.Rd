@@ -5,8 +5,8 @@
 \title{Aedes aegypti RNA-seq data expression}
 \format{A data frame with 34 rows and 5 variables}
 \description{
-A sample fragment of gene expression from an RNA-seq experiment
-of Aedes aegypti mosquito.
+A sample fragment of gene expression from an RNA-seq 
+experiment of Aedes aegypti mosquito.
 }
 \examples{
 data(ExpressionAedes)
