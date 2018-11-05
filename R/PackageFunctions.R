@@ -44,7 +44,7 @@ makeAnalysis <- function(ComparisonID,ECGObject,completeTest){
                                 Control = compID[1], Experiment = compID[2])
 
     if(!completeTest){
-        GroupStatistics <- as.data.frame(do.call(rbind, lapply(GroupStatistics,
+        GroupStatistics<-as.data.frame(do.call(rbind, lapply(GroupStatistics,
                         function(GroupStats){as.vector(unlist(GroupStats))})))
         GroupStatistics$ID <- vapply(rownames(GroupStatistics),
                         function(GroupStats) 
@@ -88,7 +88,7 @@ makeAnalysis <- function(ComparisonID,ECGObject,completeTest){
         ###
         message("Filtering GFAGs by size ...")
         
-        ResultBootstrap <- pblapply(GroupSize, function(GSize,GroupStatistics){
+        ResultBootstrap<-pblapply(GroupSize, function(GSize,GroupStatistics){
                             GroupStatistics[lapply(lapply(GroupStatistics,
                             function(GStats,GSizeStats){
                             if(GStats[1,1]==GSizeStats){GStats}else{NULL}}, 
@@ -101,17 +101,16 @@ makeAnalysis <- function(ComparisonID,ECGObject,completeTest){
         message("Running bootstrap. This may take a few minutes ...")
         
         ComparisonExpression<-data.frame(Comparison$control,
-                                         Comparison$experiment)
+                                        Comparison$experiment)
         colnames(ComparisonExpression) <- c("control","experiment")
         
         ResultBootstrap <- pblapply(ResultBootstrap, FUN = PrepareBootstrap,
-                                    ComparisonExpression = ComparisonExpression,
+                                    ComparisonExpression=ComparisonExpression,
                                     ECGObject = ECGObject)
-        
 
         ResultBootstrap <- as.data.frame(do.call(rbind,
-                                    lapply(ResultBootstrap,function(ResultBtp){
-                                    do.call(rbind,lapply(ResultBtp,
+                                lapply(ResultBootstrap,function(ResultBtp){
+                                do.call(rbind,lapply(ResultBtp,
                                         function(ResultBtpBind)
                                         as.vector(unlist(ResultBtpBind))))})))
         
@@ -131,7 +130,8 @@ makeAnalysis <- function(ComparisonID,ECGObject,completeTest){
         ResultBootstrap$Description <- vapply(rownames(ResultBootstrap), 
                                             function(ResultBtp)
                                             trimws(unlist(strsplit(ResultBtp,
-                                            "<==>")))[2],FUN.VALUE=character(1))
+                                            "<==>")))[2],
+                                            FUN.VALUE=character(1))
         rownames(ResultBootstrap) <- NULL
         ResultBootstrap <- ResultBootstrap[,c(length(ResultBootstrap)-1,
                                             length(ResultBootstrap),
@@ -144,19 +144,19 @@ makeAnalysis <- function(ComparisonID,ECGObject,completeTest){
                     ECGObject@PCorrectionMethod," ..."))
         
         ResultBootstrap$qValue_h <- p.adjust(ResultBootstrap$pValue_h,
-                                            method=ECGObject@PCorrectionMethod)
+                                        method=ECGObject@PCorrectionMethod)
         ResultBootstrap$qValue_n <- p.adjust(ResultBootstrap$pValue_n,
-                                            method=ECGObject@PCorrectionMethod)
+                                        method=ECGObject@PCorrectionMethod)
         ResultBootstrap$Significance_h <- vapply(ResultBootstrap$qValue_h,
-                                    function(ResultQValue)
-                                    ifelse(ResultQValue<=ECGObject@PCorrection,
-                                        "significative","not_significative"),
-                                    FUN.VALUE = character(1))
+                                function(ResultQValue)
+                                ifelse(ResultQValue<=ECGObject@PCorrection,
+                                    "significative","not_significative"),
+                                FUN.VALUE = character(1))
         ResultBootstrap$Significance_n <- vapply(ResultBootstrap$qValue_n,
-                                    function(ResultQValue)
-                                    ifelse(ResultQValue<=ECGObject@PCorrection,
-                                        "significative","not_significative"), 
-                                    FUN.VALUE = character(1))
+                                function(ResultQValue)
+                                ifelse(ResultQValue<=ECGObject@PCorrection,
+                                    "significative","not_significative"), 
+                                FUN.VALUE = character(1))
         
         ###
         #Adding the raw gene numbers per function to the result dataframe
@@ -184,8 +184,8 @@ makeAnalysis <- function(ComparisonID,ECGObject,completeTest){
                                             FUN = WCAnalysis, 
                                             FUN.VALUE = numeric(1))
             ResultBootstrap$Wilcox_qvalue <- p.adjust(as.numeric(
-                                            ResultBootstrap$Wilcox_pvalue),
-                                            method=ECGObject@PCorrectionMethod)
+                                        ResultBootstrap$Wilcox_pvalue),
+                                        method=ECGObject@PCorrectionMethod)
             ResultBootstrap$Wilcox_significance<-ifelse(
                                             ResultBootstrap$Wilcox_qvalue <=
                                             ECGObject@PCorrection,
@@ -203,9 +203,9 @@ makeAnalysis <- function(ComparisonID,ECGObject,completeTest){
                                                     Comparison = Comparison, 
                                                     FUN.VALUE = numeric(1))
             ResultBootstrap$Fisher_qvalue <- p.adjust(
-                                            as.numeric(
-                                            ResultBootstrap$Fisher_pvalue),
-                                            method=ECGObject@PCorrectionMethod)
+                                        as.numeric(
+                                        ResultBootstrap$Fisher_pvalue),
+                                        method=ECGObject@PCorrectionMethod)
             ResultBootstrap$Fisher_significance <- ifelse(
                                             ResultBootstrap$Fisher_qvalue <= 
                                             ECGObject@PCorrection,
@@ -274,8 +274,8 @@ SampleStatistics <- function(GroupComparisons,Control,Experiment){
     }else{
         n <-0
     }
-    Result<-data.frame(nrow(GroupComparisons),H_Control,H_Experiment,N_Control,
-                        N_Experiment, h, n)
+    Result<-data.frame(nrow(GroupComparisons),H_Control,H_Experiment,
+                        N_Control, N_Experiment, h, n)
     colnames(Result) <- c("Sample_Number_Genes", paste0("H_",Control),
                         paste0("H_",Experiment),
                         paste0("N_",Control), paste0("N_",Experiment),
@@ -289,10 +289,10 @@ SampleStatistics <- function(GroupComparisons,Control,Experiment){
 PrepareBootstrap <- function(GroupFunction,ComparisonExpression,ECGObject){
 
     PValues <- MakeBootstrap(BootstrapData = as.matrix(ComparisonExpression), 
-                        BootstrapNumber = ECGObject@BootstrapNumber,
-                        BootstrapGroupSize = as.numeric(GroupFunction[[1]][1]),
-                        BootstrapSeed = 
-                        ECGObject@SeedNumber*as.numeric(GroupFunction[[1]][1]))
+                    BootstrapNumber = ECGObject@BootstrapNumber,
+                    BootstrapGroupSize = as.numeric(GroupFunction[[1]][1]),
+                    BootstrapSeed = 
+                    ECGObject@SeedNumber*as.numeric(GroupFunction[[1]][1]))
 
     ResultPValues <- GroupFunction
     ResultPValues <- lapply(ResultPValues, function(RPValues, PValues){
@@ -311,11 +311,11 @@ PrepareBootstrap <- function(GroupFunction,ComparisonExpression,ECGObject){
 WCAnalysis <- function(pValuesGroups){
     GroupData <- pValuesGroups[,c(2,3)]
     if(length(unique(GroupData[,1][GroupData[,1]>0]))==length(GroupData[,1]) &
-        length(unique(GroupData[,2][GroupData[,2]>0]))==length(GroupData[,2]) &
-        length(unique(c(GroupData[,1][GroupData[,1]>0],
-            GroupData[,2][GroupData[,2]>0])))==
-            (length(GroupData[,2])*2) & length(GroupData[,1]>1)){
-        return(wilcox.test(GroupData[,1],GroupData[,2], paired = TRUE)$p.value)
+        length(unique(GroupData[,2][GroupData[,2]>0]))==length(GroupData[,2])
+        & length(unique(c(GroupData[,1][GroupData[,1]>0],
+        GroupData[,2][GroupData[,2]>0])))==(length(GroupData[,2])*2) &
+        length(GroupData[,1]>1)){
+        return(wilcox.test(GroupData[,1],GroupData[,2], paired=TRUE)$p.value)
     }else{
         return(1)
     }

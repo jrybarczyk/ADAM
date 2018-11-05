@@ -1,6 +1,6 @@
 #' @title Aedes aegypti RNA-seq data expression
-#' @description A sample fragment of gene expression from an RNA-seq experiment
-#' of Aedes aegypti mosquito.
+#' @description A sample fragment of gene expression from an RNA-seq 
+#' experiment of Aedes aegypti mosquito.
 #' @format A data frame with 34 rows and 5 variables
 #' @name ExpressionAedes
 #' @references AKBARI, O. S. et al. The developmental transcriptome of the 

@@ -53,19 +53,20 @@ ECGMainData <- function(ComparisonID,
         SupGeneLimit <- 2000
     }
 
-    #Check the domain analysis, species reference database and gene identifier.
-    #The argument AnalysisDomain must be a character
+    #Check the domain analysis, species reference database and gene 
+    #identifier. The argument AnalysisDomain must be a character
     #corresponding to a domain (gobp, gocc, gomf, kegg or own). The argument
     #DBSpecies must be a character corresponding to an
-    #OrgDb species package (org.Hs.eg.db, org.Dm.eg.db ...) or a character path
-    #for an own gene annotation file containing 3 columns:
+    #OrgDb species package (org.Hs.eg.db, org.Dm.eg.db ...) or a character 
+    #path for an own gene annotation file containing 3 columns:
     #gene name, term annotation and description of the term annotation. 
     #The GeneIdentifier argument must be a character containing
     #the nomenclature to be used (symbol or entrez).
     if(!missing(AnalysisDomain) & !missing(DBSpecies) & 
         !missing(GeneIdentifier)){
-        Analysis<-.checkAnalysisDomain_DBSpecies_GeneIdentifier(AnalysisDomain,
-                    DBSpecies,GeneIdentifier,GeneExpressionData)
+        Analysis<-.checkAnalysisDomain_DBSpecies_GeneIdentifier(
+                    AnalysisDomain,DBSpecies,GeneIdentifier,
+                    GeneExpressionData)
         DomainGroup <- Analysis[[1]]
         DataSpeciesFunctionsSample <- Analysis[[2]]
         DataSpeciesFunctionsRaw <- Analysis[[3]]
@@ -100,8 +101,8 @@ ECGMainData <- function(ComparisonID,
             BootstrapNumber <- 1000
         }
         
-        #Check the cutoff to be used for one of the p-value correction methods. 
-        #The PCorrection argument must be a numeric value between
+        #Check the cutoff to be used for one of the p-value correction 
+        #methods. The PCorrection argument must be a numeric value between
         #zero and one.
         if(!missing(PCorrection)){
             PCorrection <- .checkPCorrection(PCorrection)
