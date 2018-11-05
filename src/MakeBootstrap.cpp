@@ -36,7 +36,8 @@ NumericMatrix MakeBootstrap(NumericMatrix BootstrapData, int BootstrapNumber,
             }
             
             if(out(j,1)!=0){
-                pExperiment += (out(j,1)/SumExperiment)*log((out(j,1)/SumExperiment));
+                pExperiment += (out(j,1)/SumExperiment)*
+                                log((out(j,1)/SumExperiment));
             }
         }
         
