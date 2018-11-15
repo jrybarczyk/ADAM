@@ -5,6 +5,7 @@
 #' @import pbapply methods knitr
 #' @importFrom utils installed.packages
 #' @importFrom Rcpp evalCpp
+#' @importFrom stringr str_split
 #' @importFrom stats wilcox.test fisher.test
 #' @importFrom DT datatable
 #' @importFrom dplyr arrange mutate filter
@@ -21,7 +22,8 @@
 #' in which each element corresponds to 2 sample columns from the expression 
 #' data. The data's sample columns in each element from the vector are comma 
 #' separated. The first one refers to the control sample, while the second
-#' refers to the experiment.
+#' refers to the experiment. This argument must be informed by the user. There 
+#' is no default value for it.
 #' @param ExpressionData Gene expression data (microarray or RNA-seq, for
 #' example). It must be a SummarizedExperiment object, a data frame or a path
 #' for a text file tab separated containing at least 3 columns. First column 
@@ -29,7 +31,8 @@
 #' GeneIdentifier argument. Second, third and the other columns correspond to
 #' the gene expression values realated to the genes in the first column and
 #' each of these columns correspond to a different sample (control versus 
-#' experiment).
+#' experiment). This argument must be informed by the user. There 
+#' is no default value for it.
 #' @param MinGene Minimum number of genes per GFAG. It must be a positive
 #' integer value different from zero and lower than MaxGene argument.
 #' Default is 3.
@@ -58,6 +61,8 @@
 #' gene annotation file, tab separated, containing 3 columns: gene, term 
 #' annotation code and description of the term annotation. So, istead of a 
 #' string with an OrgDb name, inform a data frame or a path for the file.
+#' This argument must be informed by the user. There is no default value for
+#' it.
 #' @param PCorrectionMethod Method p-value correction: holm, hochberg, hommel,
 #' bonferroni, bh, by or fdr. Default is "fdr".
 #' @param WilcoxonTest A logical value indicating whether or not to perform
@@ -70,11 +75,14 @@
 #' according: gobp (Gene Ontology - Biological Processes), gocc (Gene Ontology
 #'  - Celular Components), gomf (Gene Ontology - Molecular Functions), kegg
 #' (KEGG Pathways) or own (if there is no annotation package - the annotations 
-#' were defined in a file by the user).
-#' @param GeneIdentifier Gene nomenclature to be used: symbol, entrez, tair
-#' (for Arabdopsis thaliana) or orf (for Saccharomyces cerevisiae or 
-#' Plasmodium falciparum). If there is no annotation package, just put the 
-#' gene nomenclature present in the user's personal annotations.
+#' were defined in a file by the user). This argument must be informed by the 
+#' user. There is no default value for it.
+#' @param GeneIdentifier Gene nomenclature to be used: entrez or tairID
+#' for Arabdopsis thaliana, entrez or orfID for Saccharomyces cerevisiae, 
+#' symbol or orfID for Plasmodium falciparum and symbol or entrez for the 
+#' other species. If there is no annotation package, just put the 
+#' gene nomenclature present in the user's personal annotations. This argument 
+#' must be informed by the user. There is no default value for it.
 #' @details The genes present in the expression data are grouped by their 
 #' respective functions according to the domains described by 
 #' AnalysisDomain argument. The relationship between genes and functions are 
@@ -135,13 +143,14 @@
 #' }
 #' @export
 
-GFAGAnalysis <- function(ComparisonID, ExpressionData, MinGene = 3,
-                        MaxGene = 2000, SeedNumber = 1049,
+GFAGAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL,
+                        MinGene = 3, MaxGene = 2000, SeedNumber = 1049,
                         BootstrapNumber = 1000, PCorrection = 0.05,
-                        DBSpecies, PCorrectionMethod = "fdr",
+                        DBSpecies = NULL, PCorrectionMethod = "fdr",
                         WilcoxonTest = FALSE, FisherTest = FALSE,
-                        AnalysisDomain, GeneIdentifier){
+                        AnalysisDomain = NULL, GeneIdentifier = NULL){
     message("Creating object ...")
+    
     ECGObject <- ECGMainData(ComparisonID = ComparisonID, ExpressionData =
                                 ExpressionData, MinGene = MinGene,
                                 MaxGene = MaxGene,
@@ -170,8 +179,7 @@ GFAGAnalysis <- function(ComparisonID, ExpressionData, MinGene = 3,
     colnames(GenesFile) <- c("gene","GroupID")
     GenesFile$GroupID <- trimws(GroupID$X1)
     GenesFile <- unique(GenesFile)
-    rm(GroupID)
-    
+
     return(list(GenesFile,ResultAnalysis))
 }
 
@@ -179,8 +187,9 @@ GFAGAnalysis <- function(ComparisonID, ExpressionData, MinGene = 3,
 #' @usage ADAnalysis(ComparisonID, ExpressionData, MinGene, MaxGene, 
 #' DBSpecies, AnalysisDomain, GeneIdentifier)
 #' @export
-ADAnalysis <- function(ComparisonID, ExpressionData, MinGene=3, MaxGene=2000, 
-                    DBSpecies, AnalysisDomain, GeneIdentifier){
+ADAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL, MinGene=3,
+                    MaxGene=2000, DBSpecies = NULL, AnalysisDomain = NULL,
+                    GeneIdentifier = NULL){
     message("Creating object ...")
     ECGObject <- ECGMainData(ComparisonID = ComparisonID, 
                             ExpressionData = ExpressionData, 
@@ -207,7 +216,6 @@ ADAnalysis <- function(ComparisonID, ExpressionData, MinGene=3, MaxGene=2000,
     colnames(GenesFile) <- c("gene","GroupID")
     GenesFile$GroupID <- trimws(GroupID$X1)
     GenesFile <- unique(GenesFile)
-    rm(GroupID)
-    
+
     return(list(GenesFile,ResultAnalysis))
 }

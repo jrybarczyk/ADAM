@@ -21,7 +21,7 @@ ECGMainData <- function(ComparisonID,
     #columns. First column mandatory corresponds to gene names,
     #according to GeneIdentifier argument. Second, third and the
     #others correspond to the gene samples expression.
-    if(!missing(ExpressionData)){
+    if(!is.null(ExpressionData)){
         GeneExpressionData <- .checkExpressionData(ExpressionData)
     }else{
         stop("Please inform a valid expression data!")
@@ -31,7 +31,8 @@ ECGMainData <- function(ComparisonID,
     #each element corresponds to 2 sample columns from
     #the expression data. The data sample columns in each element from the
     #vector are comma separated.
-    if(!missing(ComparisonID)){
+    
+    if(!is.null(ComparisonID)){
         ComparisonID <- .checkComparisonID(ComparisonID,GeneExpressionData)
     }else{
         stop("Please inform a valid comparison ID!")
@@ -41,15 +42,15 @@ ECGMainData <- function(ComparisonID,
     #(Group of Functionally Associated Genes). Both must be integer
     #positive values and different from zero. Besides, the argument MaxGene 
     #must be allways greater than MinGene.
-    if(!missing(MinGene) & !missing(MaxGene)){
+    if(!is.null(MinGene) & !is.null(MaxGene)){
         GeneNumbers <- .checkGeneNumbers(MinGene,MaxGene)
         InfGeneLimit <- GeneNumbers[1]
         SupGeneLimit <- GeneNumbers[2]
     }
-    if(missing(MinGene)){
+    if(is.null(MinGene)){
         InfGeneLimit <- 3
     }
-    if(missing(MaxGene)){
+    if(is.null(MaxGene)){
         SupGeneLimit <- 2000
     }
 
@@ -62,8 +63,8 @@ ECGMainData <- function(ComparisonID,
     #gene name, term annotation and description of the term annotation. 
     #The GeneIdentifier argument must be a character containing
     #the nomenclature to be used (symbol or entrez).
-    if(!missing(AnalysisDomain) & !missing(DBSpecies) & 
-        !missing(GeneIdentifier)){
+    if(!is.null(AnalysisDomain) & !is.null(DBSpecies) & 
+        !is.null(GeneIdentifier)){
         Analysis<-.checkAnalysisDomain_DBSpecies_GeneIdentifier(
                     AnalysisDomain,DBSpecies,GeneIdentifier,
                     GeneExpressionData)
@@ -72,13 +73,13 @@ ECGMainData <- function(ComparisonID,
         DataSpeciesFunctionsRaw <- Analysis[[3]]
         GeneNomenclature <- Analysis[[4]]
     }
-    if(missing(AnalysisDomain)){
+    if(is.null(AnalysisDomain)){
         stop("Please inform a valid domain!")
     }
-    if(missing(DBSpecies)){
+    if(is.null(DBSpecies)){
         stop("Please inform a valid database species!")
     }
-    if(missing(GeneIdentifier)){
+    if(is.null(GeneIdentifier)){
         stop("Please inform a valid gene identifier!")
     }
 
@@ -86,7 +87,7 @@ ECGMainData <- function(ComparisonID,
         #Check the seed for random generation numbers. The argument SeedNumber
         #must be a numeric value allways positive, greater than or
         #equal to zero.
-        if(!missing(SeedNumber)){
+        if(!is.null(SeedNumber)){
             SeedNumber <- .checkSeedNumber(SeedNumber)
         }else{
             SeedNumber <- 10049
@@ -95,7 +96,7 @@ ECGMainData <- function(ComparisonID,
         #Check the number of bootstraps necessary for defining GFAG p-values.
         #The argument BootstrapNumber must be an integer number
         #greater than zero.
-        if(!missing(BootstrapNumber)){
+        if(!is.null(BootstrapNumber)){
             BootstrapNumber <- .checkBootstrapNumber(BootstrapNumber)
         }else{
             BootstrapNumber <- 1000
@@ -104,7 +105,7 @@ ECGMainData <- function(ComparisonID,
         #Check the cutoff to be used for one of the p-value correction 
         #methods. The PCorrection argument must be a numeric value between
         #zero and one.
-        if(!missing(PCorrection)){
+        if(!is.null(PCorrection)){
             PCorrection <- .checkPCorrection(PCorrection)
         }else{
             PCorrection <- 0.05
@@ -113,7 +114,7 @@ ECGMainData <- function(ComparisonID,
         #Check the p-value correction method. The PCorrectionMethod argument
         #must be a character corresponding to one of the p.adjust function
         #correction methods (holm, hochberg, hommel, bonferroni, BH, BY, fdr).
-        if(!missing(PCorrectionMethod)){
+        if(!is.null(PCorrectionMethod)){
             PCorrectionMethod <- .checkPCorrectionMethod(PCorrectionMethod)
         }else{
             PCorrectionMethod <- "fdr"
@@ -122,7 +123,7 @@ ECGMainData <- function(ComparisonID,
         #Check if it will be performed the Wilcoxon Rank Sum Test. The 
         #WilcoxonTest argument should be TRUE for running the test or FALSE
         #if the test won't be performed.
-        if(!missing(WilcoxonTest)){
+        if(!is.null(WilcoxonTest)){
             WilcoxonTest <- .checkWilcoxonTest(WilcoxonTest)
         }else{
             WilcoxonTest <- FALSE
@@ -131,7 +132,7 @@ ECGMainData <- function(ComparisonID,
         #Check if it will be performed the Fisher Exact Test. The FisherTest
         #argument should be TRUE for running the test or FALSE
         #if the test won't be performed.
-        if(!missing(FisherTest)){
+        if(!is.null(FisherTest)){
             FisherTest <- .checkFisherTest(FisherTest)
         }else{
             FisherTest <- FALSE
