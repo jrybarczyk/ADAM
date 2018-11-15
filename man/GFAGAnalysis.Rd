@@ -17,7 +17,8 @@ DBSpecies, AnalysisDomain, GeneIdentifier)
 in which each element corresponds to 2 sample columns from the expression 
 data. The data's sample columns in each element from the vector are comma 
 separated. The first one refers to the control sample, while the second
-refers to the experiment.}
+refers to the experiment. This argument must be informed by the user. There 
+is no default value for it.}
 
 \item{ExpressionData}{Gene expression data (microarray or RNA-seq, for
 example). It must be a SummarizedExperiment object, a data frame or a path
@@ -26,7 +27,8 @@ mandatory corresponds to the gene identification, according to
 GeneIdentifier argument. Second, third and the other columns correspond to
 the gene expression values realated to the genes in the first column and
 each of these columns correspond to a different sample (control versus 
-experiment).}
+experiment). This argument must be informed by the user. There 
+is no default value for it.}
 
 \item{MinGene}{Minimum number of genes per GFAG. It must be a positive
 integer value different from zero and lower than MaxGene argument.
@@ -60,7 +62,9 @@ org.Ss.eg.db (Sus scrofa) and org.Xl.eg.db (Xenopus laevis).
 If there is no package, it's possible for the user to create a personal 
 gene annotation file, tab separated, containing 3 columns: gene, term 
 annotation code and description of the term annotation. So, istead of a 
-string with an OrgDb name, inform a data frame or a path for the file.}
+string with an OrgDb name, inform a data frame or a path for the file.
+This argument must be informed by the user. There is no default value for
+it.}
 
 \item{PCorrectionMethod}{Method p-value correction: holm, hochberg, hommel,
 bonferroni, bh, by or fdr. Default is "fdr".}
@@ -77,12 +81,15 @@ Default is FALSE.}
 according: gobp (Gene Ontology - Biological Processes), gocc (Gene Ontology
  - Celular Components), gomf (Gene Ontology - Molecular Functions), kegg
 (KEGG Pathways) or own (if there is no annotation package - the annotations 
-were defined in a file by the user).}
+were defined in a file by the user). This argument must be informed by the 
+user. There is no default value for it.}
 
-\item{GeneIdentifier}{Gene nomenclature to be used: symbol, entrez, tair
-(for Arabdopsis thaliana) or orf (for Saccharomyces cerevisiae or 
-Plasmodium falciparum). If there is no annotation package, just put the 
-gene nomenclature present in the user's personal annotations.}
+\item{GeneIdentifier}{Gene nomenclature to be used: entrez or tairID
+for Arabdopsis thaliana, entrez or orfID for Saccharomyces cerevisiae, 
+symbol or orfID for Plasmodium falciparum and symbol or entrez for the 
+other species. If there is no annotation package, just put the 
+gene nomenclature present in the user's personal annotations. This argument 
+must be informed by the user. There is no default value for it.}
 }
 \value{
 Return a list with two elements. The first one refers to a 
