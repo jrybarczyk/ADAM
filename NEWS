@@ -2,3 +2,5 @@ Changes in version 0.99.0 (2018-10-05)
 + Submitted to Bioconductor
 Changes in version 0.99.65 (2018-11-05)
 + Fixed possible bugs
+Changes in version 0.99.66 (2018-11-15)
++ Fixed possible problem to access kegg id
