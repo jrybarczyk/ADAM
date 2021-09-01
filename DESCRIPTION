@@ -1,12 +1,24 @@
 Package: ADAM
 Type: Package
 Title: ADAM: Activity and Diversity Analysis Module
-Version: 0.99.66
-Date: 2018-10-5
-Author: André Luiz Molan <andre.molan@unesp.br>, 
-    Giordano Bruno Sanches Seco <giordano.bruno@unesp.br>,
-    Agnes Alessandra Sekijima Takeda <agnes.takeda@unesp.br>, 
-    Jose Luiz Rybarczyk Filho <jose.luiz@unesp.br>
+Version: 1.9.1
+Date: 2021-09-01
+Authors@R:
+    c(person(given = "André Luiz",
+                 family = "Molan",
+                 role = "aut",
+                 email = "andre.molan@unesp.br"),
+      person(given = "Giordano Bruno",
+                 family = "Sanches Seco",
+                 role = "ctb"),
+      person(given = "Agnes",
+                family = "Takeda",
+                role = "ctb"),
+      person(given = "Jose",
+                family = "Rybarczyk Filho",
+                role = c("ctb", "cre", "ths"),
+                email = "jose.luiz@unesp.br")
+			 )
 Maintainer: Jose Luiz Rybarczyk Filho <jose.luiz@unesp.br>
 Description: ADAM is a GSEA R package created to group a set of genes from
     comparative samples (control versus experiment) belonging to different
@@ -23,14 +35,13 @@ Imports: Rcpp (>= 0.12.18),
     DT (>= 0.4),
     stringr (>= 1.3.1),
     SummarizedExperiment (>= 1.10.1)
-Suggests: testthat
+Suggests: testthat, rmarkdown
 LinkingTo: Rcpp
 SystemRequirements: C++11
 Encoding: UTF-8
 RoxygenNote: 6.1.0
-LazyData: TRUE
 License: GPL (>= 2)
-biocViews: GeneSetEnrichment, Pathways, KEGG
+biocViews: GeneSetEnrichment, Pathways, KEGG, GeneExpression, Microarray
 VignetteBuilder: knitr
 LazyLoad: yes
 NeedsCompilation: yes

@@ -1,7 +1,6 @@
 ---
 title: "ADAM: Activity and Diversity Analysis Module"
-author: "André L. Molan, Giordano B. S. Seco, Agnes A. S. Takeda, 
-Jose L. Rybarczyk-Filho"
+author: "André L. Molan, Giordano B. S. Seco, Agnes A. S. Takeda, Jose L. Rybarczyk-Filho"
 date: "`r doc_date()`"
 package: "`r pkg_ver('ADAM')`"
 bibliography: bibliography.bib
@@ -35,11 +34,11 @@ experiment), relative gene diversity and activity for each GFAG are
 calculated. Using bootstrap method, for each GFAG, according to relative gene
 diversity and activity, two p-values are calculated. The p-values are then 
 corrected, by using the 
-correction method defined by PCorrectionMethod argument, generating a q-value 
+correction method defined by *PCorrectionMethod* argument, generating a q-value 
 (@molan2018). The significative GFAGs will be those whose q-value stay under 
-the cutoff set by PCorrection argument. Optionally, it's possible to run 
-Wilcoxon test and/or Fisher's exact test (@fontoura2016). These tests also
-provide a corrected p-value, and siginificative groups can be seen through 
+the cutoff set by *PCorrection* argument. Optionally, it's possible to run 
+Wilcoxon ranck sum test and/or Fisher's exact test (@fontoura2016). These tests
+also provide a corrected p-value, and siginificative groups can be seen through 
 them.
 
 # GFAGAnalysis
@@ -47,11 +46,11 @@ them.
 arguments. As an example, lets consider a gene expression set of 
 *Aedes aegypti*:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 suppressMessages(library(ADAM))
 ```
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 data("ExpressionAedes")
 head(ExpressionAedes)
 ```
@@ -59,16 +58,16 @@ head(ExpressionAedes)
 The first column refers to the gene names, while the others are the expression
 obtained by a specific experiment (in this case, RNA-seq). ADAM
 always need two samples (control *versus* experiment). This way, we must 
-select two sample columns from the expression data:
+select two sample columns from the expression data for each comparison:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 Comparison <- c("control1,experiment1","control2,experiment2")
 ```
 
 Each GFAG has a number of genes associated to it. This way, the analysis can 
 consider all GFAGs or just those with a certain number of genes:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 Minimum <- 3
 Maximum <- 20
 ```
@@ -78,7 +77,7 @@ demands a seed for generating random numbers and a number of bootstraps steps
 (the number of bootstraps should be a value that ensures the p-value 
 precision):
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 SeedBootstrap <- 1049
 StepsBootstrap <- 1000
 ```
@@ -86,17 +85,17 @@ StepsBootstrap <- 1000
 The p-values will be corrected by a specific method with a certain cutoff 
 value:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 CutoffValue <- 0.05
 MethodCorrection <- "fdr"
 ```
 
-In order to group the genes according to their functions, it's necessary an
-annotation package or a file relating genes and functions. In this case,
-*Aedes aegypti* doesn't have an annotation package. This way, we build our own
-file:
+In order to group the genes according to their biological functions, it's 
+necessary an annotation package or a file relating genes and functions. In this
+case, *Aedes aegypti* doesn't have an annotation package. This way, we build our
+own file:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 data("KeggPathwaysAedes")
 head(KeggPathwaysAedes)
 ```
@@ -105,21 +104,21 @@ It's necessary to inform which function domain and gene nomenclature are being
 used. As *Aedes agypti* doesn't have an annotation package, the domain will be 
 "own" and the nomenclature "gene":
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 Domain <- "own"
 Nomenclature <- "geneStableID"
 ```
 
-Wilcoxon test and Fisher's exact test will be run:
+Wilcoxon rank sum test and Fisher's exact test will be run:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 Wilcoxon <- TRUE
 Fisher <- TRUE
 ```
 
 As all arguments were defined, then we can run GFAGAnalysis function:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 ResultAnalysis <- suppressMessages(GFAGAnalysis(ComparisonID = Comparison, 
                             ExpressionData = ExpressionAedes,
                             MinGene = Minimum,
@@ -140,14 +139,14 @@ showing messages during the *GFAGAnalysis* function execution. The output of
 *GFAGAnalysis* will be a *list* with two elements. The first corresponds to a
 *data frame* showing genes and their respective functions:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 head(ResultAnalysis[[1]])
 ```
 
 The second element of the output list result corresponds to data frames
 according to the argument ComparisonID:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 DT::datatable(as.data.frame(ResultAnalysis[[2]][1]), width = 800,
             options = list(scrollX = TRUE))
 DT::datatable(as.data.frame(ResultAnalysis[[2]][2]), width = 800, 
@@ -161,8 +160,10 @@ following columns:
 term, KEGG pathway or one according to users annotations).</div> 
 * <div style="text-align: justify"> **Description** - Description of the 
 GFAG.</div> 
-* <div style="text-align: justify"> **Raw_Number_Genes** -  </div>
-* <div style="text-align: justify"> **Sample_Number_Genes** -  </div> 
+* <div style="text-align: justify"> **Raw_Number_Genes** -  Total number of 
+genes related to the GFAG.</div>
+* <div style="text-align: justify"> **Sample_Number_Genes** - Number of genes, 
+present in the sample, related to the GFAG. </div> 
 * <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity
 of each sample (control *versus* experiment).</div> 
 * <div style="text-align: justify"> **N_** - Two columns. GFAG gene activity 
@@ -186,7 +187,7 @@ related to gene activity. "significative" means the q-value is lower than
 the cutoff set by PCorrection argument, while "not-significative" means the
 opposite.</div> 
 * <div style="text-align: justify"> **Wilcox_pvalue** - GFAG p-value generated
-by Wilcoxon test.</div>
+by Wilcoxon rank test.</div>
 * <div style="text-align: justify"> **Wilcox_qvalue** - Wilcoxon GFAG 
 corrected p-value.</div>
 * <div style="text-align: justify"> **Wilcox_significance** - GFAG 
@@ -208,7 +209,7 @@ gene diversity and activity of each GFAG with no signicance by bootstrap,
 Wilcoxon or Fisher. As an example, lets consider the same gene expression set
 of *Aedes aegypti* previously used in *GFAGAnalysis* funcion example:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 suppressMessages(library(ADAM))
 data("ExpressionAedes")
 data("KeggPathwaysAedes")
@@ -218,7 +219,7 @@ As ADAM always need two samples (control *versus* experiment), let's select
 two sample columns from the expression data and define minimum and maximum 
 number of genes per GFAG:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 Comparison <- c("control1,experiment1")
 Minimum <- 3
 Maximum <- 100
@@ -227,7 +228,7 @@ Maximum <- 100
 *Aedes aegypti* doesn't have an annotation package. This way, we build our own
 file:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 SpeciesID <- "KeggPathwaysAedes"
 ```
 
@@ -235,14 +236,14 @@ It's necessary to inform which function domain and gene nomenclature are being
 used. *Aedes agypti* doesn't have an annotation package. So the domain will be 
 "own" and the nomenclature "geneStableID":
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 Domain <- "own"
 Nomenclature <- "geneStableID"
 ```
 
 As all arguments were defined, then we can run ADAnalysis function:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 ResultAnalysis <- suppressMessages(ADAnalysis(ComparisonID = Comparison, 
                             ExpressionData = ExpressionAedes,
                             MinGene = Minimum,
@@ -257,14 +258,14 @@ showing messages during the *ADAnalysis* function execution. The output of
 *ADAnalysis* will be a *list* with two elements. The first corresponds to a
 *data frame* showing genes and their respective functions:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 head(ResultAnalysis[[1]])
 ```
 
 The second element of the output list result corresponds to data frames
 according to the argument ComparisonID:
 
-```{r eval=TRUE, fig.height=6, fig.width=6}
+```{r eval=TRUE, out.height.px=6, out.width.px=6}
 DT::datatable(as.data.frame(ResultAnalysis[[2]][1]), width = 800, 
             options = list(scrollX = TRUE))
 ```
@@ -276,8 +277,10 @@ following columns:
 term, KEGG pathway or one according to users annotations).</div> 
 * <div style="text-align: justify"> **Description** - Description of the 
 GFAG.</div> 
-* <div style="text-align: justify"> **Raw_Number_Genes** -  </div>
-* <div style="text-align: justify"> **Sample_Number_Genes** -  </div> 
+* <div style="text-align: justify"> **Raw_Number_Genes** - Total number of genes
+related to the GFAG. </div>
+* <div style="text-align: justify"> **Sample_Number_Genes** - Number of genes,
+present in the sample, related to the GFAG. </div> 
 * <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity
 of each sample (control *versus* experiment).</div> 
 * <div style="text-align: justify"> **N_** - Two columns. GFAG gene activity 
@@ -288,7 +291,7 @@ of each sample (control *versus* experiment).</div>
 
 # Session information
 
-```{r, eval=TRUE, label='Session information', , echo=FALSE}
+```{r, eval=TRUE, out.height.px=6, out.width.px=6, label='Session information', , echo=FALSE}
 sessionInfo()
 ```
 
