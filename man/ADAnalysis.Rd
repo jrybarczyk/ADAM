@@ -94,7 +94,8 @@ calculated.
 ##
 #Partial Analysis with Aedes aegypti through ADAnalysis function
 ##
-data(ExpressionHs)
+data(ExpressionAedes)
+data(KeggPathwaysAedes)
 ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
 ExpressionData = ExpressionAedes, MinGene = 3L, MaxGene = 20L, 
 DBSpecies = KeggPathwaysAedes, AnalysisDomain = "own",
