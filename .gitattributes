@@ -1,0 +1,9 @@
+# Keep GitHub Linguist focused on source code.
+vignettes/*.html linguist-generated=true
+*.Rcheck/** linguist-generated=true
+ADAM.BiocCheck/** linguist-generated=true
+benchmark_results/** linguist-generated=true
+src/*.o linguist-generated=true
+src/*.so linguist-generated=true
+src/*.dll linguist-generated=true
+src/*.dylib linguist-generated=true
