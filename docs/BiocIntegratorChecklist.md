@@ -7,7 +7,7 @@ clear priorities and an execution log.
 
 ## P0 (Critical)
 
-- [ ] Make `run_adam()` the primary interface across docs, examples, and vignettes.
+- [~] Make `run_adam()` the primary interface across docs, examples, and vignettes.
 - [ ] Keep Bioconductor container support as first-class input/output:
   `SummarizedExperiment`, `SingleCellExperiment`, `ExpressionSet`.
 - [ ] Ensure outputs are consistently returned as `SummarizedExperiment`
@@ -43,7 +43,8 @@ clear priorities and an execution log.
 
 - [x] 2026-02-17: Created `devel` and `adam-legacy` branches.
 - [x] 2026-02-17: Added Bioconductor dataset model templates under `scripts/models/`.
-- [ ] Next: convert vignettes/examples to make `run_adam()` the default path.
+- [x] 2026-02-17: Updated `vignettes/ADAM.Rmd` to make `run_adam()` the default workflow.
+- [ ] Next: align man page examples and remaining legacy-first references with `run_adam()`-first messaging.
 
 ## Working Rules (devel)
 

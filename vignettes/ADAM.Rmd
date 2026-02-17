@@ -1,13 +1,13 @@
 ---
 title: "ADAM: Activity and Diversity Analysis Module"
 author: >
-  André L. Molan, Giordano B. S. Seco, Agnes A. S. Takeda,
+  Andre L. Molan, Giordano B. S. Seco, Agnes A. S. Takeda,
   Jose L. Rybarczyk-Filho
 date: "`r doc_date()`"
 package: "`r pkg_ver('ADAM')`"
 bibliography: bibliography.bib
 fig_caption: yes
-output: 
+output:
     BiocStyle::html_document:
         css: custom.css
 vignette: >
@@ -17,284 +17,147 @@ vignette: >
 ---
 
 # Overview
-*ADAM* is a GSEA R package created to group a set of genes from 
-comparative samples (control *versus* experiment) according to their 
-respective functions (Gene Ontology and KEGG pathways as default) and show 
-their significance by calculating p-values referring to gene diversity and 
-activity (@Castro2009). Each group of genes is called GFAG 
-(Group of Functionally Associated Genes). The package has support for many 
-species in regards to the genes and their respective functions.
 
-In the package's analysis, all genes present in the expression data are 
-grouped by their respective functions according to the domains described by 
-AnalysisDomain argument. The relationship between genes and functions are made
-based on the species annotation package. If there is no annotation package, 
-a three column file (gene, function and function description) must be 
-provided. For each GFAG, gene diversity and activity in each sample are 
-calculated. As the package always compare two samples (control *versus* 
-experiment), relative gene diversity and activity for each GFAG are 
-calculated. Using bootstrap method, for each GFAG, according to relative gene
-diversity and activity, two p-values are calculated. The p-values are then 
-corrected, by using the 
-correction method defined by *PCorrectionMethod* argument, generating a q-value 
-(@molan2018). The significative GFAGs will be those whose q-value stay under 
-the cutoff set by *PCorrection* argument. Optionally, it's possible to run 
-Wilcoxon ranck sum test and/or Fisher's exact test (@fontoura2016). These tests
-also provide a corrected p-value, and siginificative groups can be seen through 
-them.
+*ADAM* performs gene set enrichment analysis by grouping genes from comparative
+samples (control versus experiment) according to functional groups (GFAGs), and
+quantifies both diversity and activity signals for each group (@Castro2009).
 
-# GFAGAnalysis
-*GFAGAnalysis* function provides a complete analysis, using all available
-arguments. As an example, lets consider a gene expression set of 
-*Aedes aegypti*:
+The package now provides a Bioconductor-oriented interface, `run_adam()`, which
+is the recommended entry point for new analyses. It supports:
 
-```{r gfag-load-package, eval=TRUE, out.height.px=6, out.width.px=6}
-suppressMessages(library(ADAM))
-```
+- legacy `data.frame` or file inputs
+- `SummarizedExperiment`
+- `SingleCellExperiment`
+- `ExpressionSet`
 
-```{r gfag-show-expression, eval=TRUE, out.height.px=6, out.width.px=6}
-data("ExpressionAedes")
-head(ExpressionAedes)
-```
+This vignette focuses on `run_adam()` first, and keeps legacy APIs in a
+compatibility section.
 
-The first column refers to the gene names, while the others are the expression
-obtained by a specific experiment (in this case, RNA-seq). ADAM
-always need two samples (control *versus* experiment). This way, we must 
-select two sample columns from the expression data for each comparison:
-
-```{r gfag-define-comparisons, eval=TRUE, out.height.px=6, out.width.px=6}
-Comparison <- c("control1,experiment1","control2,experiment2")
-```
-
-Each GFAG has a number of genes associated to it. This way, the analysis can 
-consider all GFAGs or just those with a certain number of genes:
-
-```{r gfag-define-min-max, eval=TRUE, out.height.px=6, out.width.px=6}
-Minimum <- 3
-Maximum <- 20
-```
-
-The p-values for each GFAG is calculated through the bootstrap method, which
-demands a seed for generating random numbers and a number of bootstraps steps
-(the number of bootstraps should be a value that ensures the p-value 
-precision):
-
-```{r gfag-define-bootstrap, eval=TRUE, out.height.px=6, out.width.px=6}
-SeedBootstrap <- 1049
-StepsBootstrap <- 1000
-```
-
-The p-values will be corrected by a specific method with a certain cutoff 
-value:
-
-```{r gfag-define-correction, eval=TRUE, out.height.px=6, out.width.px=6}
-CutoffValue <- 0.05
-MethodCorrection <- "fdr"
-```
-
-In order to group the genes according to their biological functions, it's 
-necessary an annotation package or a file relating genes and functions. In this
-case, *Aedes aegypti* doesn't have an annotation package. This way, we build our
-own file:
-
-```{r gfag-load-kegg, eval=TRUE, out.height.px=6, out.width.px=6}
-data("KeggPathwaysAedes")
-head(KeggPathwaysAedes)
-```
-
-It's necessary to inform which function domain and gene nomenclature are being 
-used. As *Aedes agypti* doesn't have an annotation package, the domain will be 
-"own" and the nomenclature "gene":
-
-```{r gfag-define-domain-id, eval=TRUE, out.height.px=6, out.width.px=6}
-Domain <- "own"
-Nomenclature <- "geneStableID"
-```
-
-Wilcoxon rank sum test and Fisher's exact test will be run:
-
-```{r gfag-enable-tests, eval=TRUE, out.height.px=6, out.width.px=6}
-Wilcoxon <- TRUE
-Fisher <- TRUE
-```
-
-As all arguments were defined, then we can run GFAGAnalysis function:
-
-```{r gfag-run-analysis, eval=TRUE, out.height.px=6, out.width.px=6}
-ResultAnalysis <- suppressMessages(GFAGAnalysis(ComparisonID = Comparison, 
-                            ExpressionData = ExpressionAedes,
-                            MinGene = Minimum,
-                            MaxGene = Maximum,
-                            SeedNumber = SeedBootstrap, 
-                            BootstrapNumber = StepsBootstrap,
-                            PCorrection = CutoffValue,
-                            DBSpecies = KeggPathwaysAedes, 
-                            PCorrectionMethod = MethodCorrection,
-                            WilcoxonTest = Wilcoxon,
-                            FisherTest = Fisher,
-                            AnalysisDomain = Domain, 
-                            GeneIdentifier = Nomenclature))
-```
-
-In the example above, we used the function *supressMessages* just to stop 
-showing messages during the *GFAGAnalysis* function execution. The output of
-*GFAGAnalysis* will be a *list* with two elements. The first corresponds to a
-*data frame* showing genes and their respective functions:
-
-```{r gfag-output-genes, eval=TRUE, out.height.px=6, out.width.px=6}
-head(ResultAnalysis[[1]])
-```
-
-The second element of the output list result corresponds to data frames
-according to the argument ComparisonID:
-
-```{r gfag-output-comparisons, eval=TRUE, out.height.px=6, out.width.px=6}
-DT::datatable(as.data.frame(ResultAnalysis[[2]][1]), width = 800,
-            options = list(scrollX = TRUE))
-DT::datatable(as.data.frame(ResultAnalysis[[2]][2]), width = 800, 
-            options = list(scrollX = TRUE))
-```
-
-The data frames corresponding to the second element of the list have the 
-following columns:
-
-* <div style="text-align: justify"> **ID** - A code identifying the GFAG (GO
-term, KEGG pathway or one according to users annotations).</div> 
-* <div style="text-align: justify"> **Description** - Description of the 
-GFAG.</div> 
-* <div style="text-align: justify"> **Raw_Number_Genes** -  Total number of 
-genes related to the GFAG.</div>
-* <div style="text-align: justify"> **Sample_Number_Genes** - Number of genes, 
-present in the sample, related to the GFAG. </div> 
-* <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity
-of each sample (control *versus* experiment).</div> 
-* <div style="text-align: justify"> **N_** - Two columns. GFAG gene activity 
-of each sample (control *versus* experiment).</div> 
-* <div style="text-align: justify"> **h** - Relative gene diversity. </div> 
-* <div style="text-align: justify"> **n** - Relative gene activity. </div> 
-* <div style="text-align: justify"> **pValue_h** - GFAG p-value related to 
-gene diversity.</div> 
-* <div style="text-align: justify"> **pValue_n** - GFAG p-value related to 
-gene activity.</div> 
-* <div style="text-align: justify"> **qValue_h** - GFAG corrected p-value 
-related to gene diversity.</div> 
-* <div style="text-align: justify"> **qValue_n** - GFAG corrected p-value 
-related to gene activity.</div> 
-* <div style="text-align: justify"> **Significance_h** - GFAG significance
-related to gene diversity. "significative" means the q-value is lower than
-the cutoff set by PCorrection argument, while "not-significative" means the
-opposite.</div> 
-* <div style="text-align: justify"> **Significance_n** - GFAG significance
-related to gene activity. "significative" means the q-value is lower than
-the cutoff set by PCorrection argument, while "not-significative" means the
-opposite.</div> 
-* <div style="text-align: justify"> **Wilcox_pvalue** - GFAG p-value generated
-by Wilcoxon rank test.</div>
-* <div style="text-align: justify"> **Wilcox_qvalue** - Wilcoxon GFAG 
-corrected p-value.</div>
-* <div style="text-align: justify"> **Wilcox_significance** - GFAG 
-significance related Wilcoxon test. "significative" means the q-value is lower
-than the cutoff set by PCorrection argument, while "not-significative" means 
-the opposite.</div> 
-* <div style="text-align: justify"> **Fisher_pvalue** - GFAG p-value generated
-by Fisher's exact test.</div>
-* <div style="text-align: justify"> **Fisher_qvalue** - Fisher GFAG corrected
-p-value.</div>
-* <div style="text-align: justify"> **Fisher_significance** - GFAG 
-significance related to Fisher's exact test. "significative" means the q-value
-is lower than the cutoff set by PCorrection argument, while 
-"not-significative" means the opposite.</div> 
-
-# ADAnalysis
-*ADAnalysis* function provides a partial analysis, where is calculated just
-gene diversity and activity of each GFAG with no signicance by bootstrap, 
-Wilcoxon or Fisher. As an example, lets consider the same gene expression set
-of *Aedes aegypti* previously used in *GFAGAnalysis* funcion example:
-
-```{r ad-load-data, eval=TRUE, out.height.px=6, out.width.px=6}
+```{r setup, eval=TRUE}
 suppressMessages(library(ADAM))
 data("ExpressionAedes")
 data("KeggPathwaysAedes")
 ```
 
-As ADAM always need two samples (control *versus* experiment), let's select 
-two sample columns from the expression data and define minimum and maximum 
-number of genes per GFAG:
+# Recommended workflow: `run_adam()`
 
-```{r ad-define-comparison, eval=TRUE, out.height.px=6, out.width.px=6}
-Comparison <- c("control1,experiment1")
-Minimum <- 3
-Maximum <- 100
+## 1) Partial mode with legacy table input
+
+```{r run-adam-partial-table, eval=TRUE}
+res_partial <- suppressMessages(run_adam(
+  x = ExpressionAedes,
+  mode = "partial",
+  comparison_id = c("control1,experiment1", "control2,experiment2"),
+  MinGene = 3L,
+  MaxGene = 20L,
+  DBSpecies = KeggPathwaysAedes,
+  AnalysisDomain = "own",
+  GeneIdentifier = "geneStableID"
+))
+
+res_partial
+head(as.data.frame(SummarizedExperiment::rowData(res_partial)))
 ```
 
-*Aedes aegypti* doesn't have an annotation package. This way, we build our own
-file:
+`run_adam()` returns a `SummarizedExperiment` with:
 
-```{r ad-define-species, eval=TRUE, out.height.px=6, out.width.px=6}
-SpeciesID <- "KeggPathwaysAedes"
+- `assay("metrics")`: numeric analysis metrics
+- `rowData()`: GFAG annotations and per-comparison fields
+- `metadata()`: legacy result, gene-function map, comparison IDs, and mode
+
+```{r run-adam-partial-inspect, eval=TRUE}
+colnames(SummarizedExperiment::assay(res_partial, "metrics"))
+head(S4Vectors::metadata(res_partial)$comparison_id)
 ```
 
-It's necessary to inform which function domain and gene nomenclature are being 
-used. *Aedes agypti* doesn't have an annotation package. So the domain will be 
-"own" and the nomenclature "geneStableID":
+## 2) Complete mode (bootstrap-based significance)
 
-```{r ad-define-domain-id, eval=TRUE, out.height.px=6, out.width.px=6}
-Domain <- "own"
-Nomenclature <- "geneStableID"
+```{r run-adam-complete, eval=TRUE}
+res_complete <- suppressMessages(run_adam(
+  x = ExpressionAedes,
+  mode = "complete",
+  comparison_id = c("control1,experiment1"),
+  MinGene = 3L,
+  MaxGene = 20L,
+  SeedNumber = 1049,
+  BootstrapNumber = 50L,
+  PCorrection = 0.05,
+  PCorrectionMethod = "fdr",
+  WilcoxonTest = FALSE,
+  FisherTest = FALSE,
+  DBSpecies = KeggPathwaysAedes,
+  AnalysisDomain = "own",
+  GeneIdentifier = "geneStableID"
+))
+
+res_complete
+head(as.data.frame(SummarizedExperiment::rowData(res_complete)))
 ```
 
-As all arguments were defined, then we can run ADAnalysis function:
+# Bioconductor container example (`SummarizedExperiment`)
 
-```{r ad-run-analysis, eval=TRUE, out.height.px=6, out.width.px=6}
-ResultAnalysis <- suppressMessages(ADAnalysis(ComparisonID = Comparison, 
-                            ExpressionData = ExpressionAedes,
-                            MinGene = Minimum,
-                            MaxGene = Maximum,
-                            DBSpecies = KeggPathwaysAedes, 
-                            AnalysisDomain = Domain, 
-                            GeneIdentifier = Nomenclature))
+```{r run-adam-se, eval=TRUE}
+expr <- as.matrix(ExpressionAedes[, -1])
+rownames(expr) <- as.character(ExpressionAedes$gene)
+
+col_data <- S4Vectors::DataFrame(
+  condition = c("control", "experiment", "control", "experiment"),
+  row.names = colnames(expr)
+)
+
+se <- SummarizedExperiment::SummarizedExperiment(
+  assays = list(counts = expr),
+  colData = col_data
+)
+
+res_se <- suppressMessages(run_adam(
+  x = se,
+  mode = "partial",
+  assay_name = "counts",
+  group_col = "condition",
+  contrast = c("control", "experiment"),
+  DBSpecies = KeggPathwaysAedes,
+  AnalysisDomain = "own",
+  GeneIdentifier = "geneStableID"
+))
+
+res_se
+head(as.data.frame(SummarizedExperiment::rowData(res_se)))
 ```
 
-In the example above, we used the function *supressMessages* just to stop 
-showing messages during the *ADAnalysis* function execution. The output of
-*ADAnalysis* will be a *list* with two elements. The first corresponds to a
-*data frame* showing genes and their respective functions:
+# Legacy APIs (compatibility)
 
-```{r ad-output-genes, eval=TRUE, out.height.px=6, out.width.px=6}
-head(ResultAnalysis[[1]])
+The legacy APIs remain available:
+
+- `ADAnalysis()` for partial analysis
+- `GFAGAnalysis()` for complete analysis
+
+They return the original list structure (`gene-function map`,
+`comparison result tables`). `run_adam()` wraps these APIs and converts their
+output to `SummarizedExperiment` for easier Bioconductor interoperability.
+
+```{r legacy-compatibility, eval=TRUE}
+legacy_partial <- suppressMessages(ADAnalysis(
+  ComparisonID = c("control1,experiment1"),
+  ExpressionData = ExpressionAedes,
+  MinGene = 3L,
+  MaxGene = 20L,
+  DBSpecies = KeggPathwaysAedes,
+  AnalysisDomain = "own",
+  GeneIdentifier = "geneStableID"
+))
+
+length(legacy_partial)
+head(legacy_partial[[1]])
 ```
 
-The second element of the output list result corresponds to data frames
-according to the argument ComparisonID:
+# Reproducibility
 
-```{r ad-output-comparison, eval=TRUE, out.height.px=6, out.width.px=6}
-DT::datatable(as.data.frame(ResultAnalysis[[2]][1]), width = 800, 
-            options = list(scrollX = TRUE))
-```
+- Use fixed `SeedNumber` and `BootstrapNumber` for `mode = "complete"`.
+- Keep `DBSpecies`, `AnalysisDomain`, and `GeneIdentifier` consistent across
+  comparative runs.
+- Save outputs as `.rds` and include `sessionInfo()` in reports.
 
-The data frames corresponding to the second element of the list have the 
-following columns:
-
-* <div style="text-align: justify"> **ID** - A code identifying the GFAG (GO
-term, KEGG pathway or one according to users annotations).</div> 
-* <div style="text-align: justify"> **Description** - Description of the 
-GFAG.</div> 
-* <div style="text-align: justify"> **Raw_Number_Genes** - Total number of genes
-related to the GFAG. </div>
-* <div style="text-align: justify"> **Sample_Number_Genes** - Number of genes,
-present in the sample, related to the GFAG. </div> 
-* <div style="text-align: justify"> **H_** - Two columns. GFAG gene diversity
-of each sample (control *versus* experiment).</div> 
-* <div style="text-align: justify"> **N_** - Two columns. GFAG gene activity 
-of each sample (control *versus* experiment).</div> 
-* <div style="text-align: justify"> **h** - Relative gene diversity. </div> 
-* <div style="text-align: justify"> **n** - Relative gene activity. </div> 
-
-
-# Session information
-
-```{r session-information, eval=TRUE, echo=FALSE}
+```{r session-info, eval=FALSE}
 sessionInfo()
 ```
-
-# References
