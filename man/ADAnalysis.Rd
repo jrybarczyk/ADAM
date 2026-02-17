@@ -72,12 +72,10 @@ a list where each position is a data frame presenting the result of the
 analysis, according to ComparisonID argument.
 }
 \description{
-Analysis of functionally associated gene groups, based on
-gene diversity and activity, for different species according to existing 
-annotation packages or user's personal annotations. ADAnalysis function 
-allows to run a partial analysis, where is calculated just gene diversity
-and activity of each GFAG with no signicance by bootrstrap, Wilcoxon or 
-Fisher.
+Legacy partial-analysis interface for ADAM.
+For new analyses, prefer \code{run_adam(mode = "partial")}, which returns
+a \code{SummarizedExperiment}. \code{ADAnalysis} remains available for
+backward compatibility and returns the original list-based structure.
 }
 \details{
 The genes present in the expression data are grouped by their 
@@ -91,9 +89,18 @@ experiment), relative gene diversity and activity for each GFAG are
 calculated.
 }
 \examples{
-##
-#Partial Analysis with Aedes aegypti through ADAnalysis function
-##
+# Recommended interface (partial mode)
+data(ExpressionAedes)
+data(KeggPathwaysAedes)
+se_partial <- run_adam(
+x = ExpressionAedes,
+mode = "partial",
+comparison_id = c("control1,experiment1"),
+MinGene = 3L, MaxGene = 20L,
+DBSpecies = KeggPathwaysAedes, AnalysisDomain = "own",
+GeneIdentifier = "geneStableID")
+
+# Legacy interface (kept for compatibility)
 data(ExpressionAedes)
 data(KeggPathwaysAedes)
 ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),

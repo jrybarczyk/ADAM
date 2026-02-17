@@ -94,10 +94,10 @@ a list where each position is a data frame presenting the result of the
 analysis, according to ComparisonID argument.
 }
 \description{
-Analysis of functionally associated gene groups, based on
-gene diversity and activity, for different species according to existing 
-annotation packages or user's personal annotations. GFAGAnalysis function 
-allows to run a complete analysis, using all available arguments.
+Legacy complete-analysis interface for ADAM.
+For new analyses, prefer \code{run_adam(mode = "complete")}, which returns
+a \code{SummarizedExperiment}. \code{GFAGAnalysis} remains available for
+backward compatibility and returns the original list-based structure.
 }
 \details{
 The genes present in the expression data are grouped by their 
@@ -118,9 +118,19 @@ exact test. These tests also provide a corrected p-value,
 and siginificative groups can be seen through them.
 }
 \examples{
-##
-#Complete analysis with Aedes aegypti through GFAGAnalysis function
-##
+# Recommended interface (complete mode)
+data(ExpressionAedes)
+data(KeggPathwaysAedes)
+se_complete <- run_adam(
+x = ExpressionAedes,
+mode = "complete",
+comparison_id = c("control1,experiment1"),
+MinGene = 3L, MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 50L,
+PCorrection = 0.05, DBSpecies = KeggPathwaysAedes,
+PCorrectionMethod = "fdr", WilcoxonTest = FALSE, FisherTest = FALSE,
+AnalysisDomain = "own", GeneIdentifier = "geneStableID")
+
+# Legacy interface (kept for compatibility)
 data(ExpressionAedes)
 data(KeggPathwaysAedes)
 ResultAnalysis <- GFAGAnalysis(

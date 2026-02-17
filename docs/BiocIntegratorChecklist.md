@@ -44,7 +44,8 @@ clear priorities and an execution log.
 - [x] 2026-02-17: Created `devel` and `adam-legacy` branches.
 - [x] 2026-02-17: Added Bioconductor dataset model templates under `scripts/models/`.
 - [x] 2026-02-17: Updated `vignettes/ADAM.Rmd` to make `run_adam()` the default workflow.
-- [ ] Next: align man page examples and remaining legacy-first references with `run_adam()`-first messaging.
+- [x] 2026-02-17: Aligned `ADAnalysis` and `GFAGAnalysis` man page messaging/examples to `run_adam()`-first guidance.
+- [ ] Next: plan analysis + visualization examples (Bioconductor-native reporting and plots).
 
 ## Working Rules (devel)
 

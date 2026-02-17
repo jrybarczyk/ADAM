@@ -15,10 +15,10 @@
 #' @usage GFAGAnalysis(ComparisonID, ExpressionData, MinGene, MaxGene, 
 #' SeedNumber, BootstrapNumber, PCorrection, DBSpecies, PCorrectionMethod, 
 #' WilcoxonTest, FisherTest, AnalysisDomain, GeneIdentifier)
-#' @description Analysis of functionally associated gene groups, based on
-#' gene diversity and activity, for different species according to existing 
-#' annotation packages or user's personal annotations. GFAGAnalysis function 
-#' allows to run a complete analysis, using all available arguments. 
+#' @description Legacy complete-analysis interface for ADAM.
+#' For new analyses, prefer \code{run_adam(mode = "complete")}, which returns
+#' a \code{SummarizedExperiment}. \code{GFAGAnalysis} remains available for
+#' backward compatibility and returns the original list-based structure.
 #' @param ComparisonID Sample comparisons identification. It must be a vector
 #' in which each element corresponds to 2 sample columns from the expression 
 #' data. The data's sample columns in each element from the vector are comma 
@@ -110,9 +110,27 @@
 #' a list where each position is a data frame presenting the result of the 
 #' analysis, according to ComparisonID argument.
 #' @examples
-#' ##
-#' #Complete analysis with Aedes aegypti through GFAGAnalysis function
-#' ##
+#' # Recommended interface (complete mode)
+#' data(ExpressionAedes)
+#' data(KeggPathwaysAedes)
+#' se_complete <- run_adam(
+#'   x = ExpressionAedes,
+#'   mode = "complete",
+#'   comparison_id = c("control1,experiment1"),
+#'   MinGene = 3L,
+#'   MaxGene = 20L,
+#'   SeedNumber = 1049,
+#'   BootstrapNumber = 50L,
+#'   PCorrection = 0.05,
+#'   DBSpecies = KeggPathwaysAedes,
+#'   PCorrectionMethod = "fdr",
+#'   WilcoxonTest = FALSE,
+#'   FisherTest = FALSE,
+#'   AnalysisDomain = "own",
+#'   GeneIdentifier = "geneStableID"
+#' )
+#'
+#' # Legacy interface (kept for compatibility)
 #' data(ExpressionAedes)
 #' data(KeggPathwaysAedes)
 #' ResultAnalysis <- GFAGAnalysis(
@@ -186,12 +204,10 @@ GFAGAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL,
 #' @rdname ADAnalysis
 #' @usage ADAnalysis(ComparisonID, ExpressionData, MinGene, MaxGene, 
 #' DBSpecies, AnalysisDomain, GeneIdentifier)
-#' @description Analysis of functionally associated gene groups, based on
-#' gene diversity and activity, for different species according to existing 
-#' annotation packages or user's personal annotations. ADAnalysis function 
-#' allows to run a partial analysis, where is calculated just gene diversity
-#' and activity of each GFAG with no signicance by bootrstrap, Wilcoxon or 
-#' Fisher.
+#' @description Legacy partial-analysis interface for ADAM.
+#' For new analyses, prefer \code{run_adam(mode = "partial")}, which returns
+#' a \code{SummarizedExperiment}. \code{ADAnalysis} remains available for
+#' backward compatibility and returns the original list-based structure.
 #' @param ComparisonID Sample comparisons identification. It must be a vector
 #' in which each element corresponds to 2 sample columns from the expression 
 #' data. The data's sample columns in each element from the vector are comma 
@@ -261,9 +277,21 @@ GFAGAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL,
 #' a list where each position is a data frame presenting the result of the 
 #' analysis, according to ComparisonID argument.
 #' @examples
-#' ##
-#' #Partial Analysis with Aedes aegypti through ADAnalysis function
-#' ##
+#' # Recommended interface (partial mode)
+#' data(ExpressionAedes)
+#' data(KeggPathwaysAedes)
+#' se_partial <- run_adam(
+#'   x = ExpressionAedes,
+#'   mode = "partial",
+#'   comparison_id = c("control1,experiment1"),
+#'   MinGene = 3L,
+#'   MaxGene = 20L,
+#'   DBSpecies = KeggPathwaysAedes,
+#'   AnalysisDomain = "own",
+#'   GeneIdentifier = "geneStableID"
+#' )
+#'
+#' # Legacy interface (kept for compatibility)
 #' data(ExpressionAedes)
 #' data(KeggPathwaysAedes)
 #' ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
