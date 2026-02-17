@@ -12,16 +12,20 @@ if(getRversion() >= "3.5"){
     
     DataFile <- ExpressionData
     
-    if(is(DataFile,"SummarizedExperiment") | 
-        is(DataFile,"RangedSummarizedExperiment")){
-        DataFile <- as.data.frame(assay(DataFile))
-        colnames(DataFile)[1] <- "gene"
-        GeneColumn <- as.data.frame(as.character(DataFile$gene))
-        DataFile$gene <- NULL
-        DataFile <- as.matrix(DataFile)
-        DataFile <- apply(DataFile,2,as.numeric)
-        DataFile <- as.data.frame(DataFile)
-        DataFile <- cbind.data.frame(GeneColumn,DataFile)
+    if (is(DataFile, "SummarizedExperiment") ||
+        is(DataFile, "RangedSummarizedExperiment")) {
+        AssayData <- as.matrix(assay(DataFile))
+        GeneIDs <- rownames(AssayData)
+        if (is.null(GeneIDs)) {
+            stop(
+                "Gene identifiers are missing in SummarizedExperiment row names."
+            )
+        }
+        DataFile <- as.data.frame(AssayData, stringsAsFactors = FALSE)
+        DataFile <- lapply(DataFile, as.numeric)
+        DataFile <- as.data.frame(DataFile, stringsAsFactors = FALSE)
+        DataFile <- cbind.data.frame(gene = as.character(GeneIDs), DataFile,
+                                    stringsAsFactors = FALSE)
     }else if(!is.data.frame(DataFile)){
         if(!file.exists(DataFile)){
             stop("Please, check the format of the expression data. 
@@ -38,13 +42,19 @@ if(getRversion() >= "3.5"){
         stop("Check the data format to Conditions! The Expression data must 
             have at list 3 columns.")
     }else{
+        if (anyDuplicated(colnames(DataFile)[-1])) {
+            stop("Sample names in expression data must be unique.")
+        }
         ExpressionColumns <- DataFile    
         ExpressionColumns$gene <- NULL
         ExpressionColumns <- as.list(ExpressionColumns)
-        ExpressionColumns <- sapply(ExpressionColumns,
-                                function(ExpColumn) is.numeric(ExpColumn))
+        ExpressionColumns <- vapply(ExpressionColumns,
+                                function(ExpColumn) is.numeric(ExpColumn),
+                                logical(1))
         if(sum(ExpressionColumns)!=(ncol(DataFile)-1)){
             stop("Check the format data! Expression values must be numeric.")
+        }else if(any(!is.finite(as.matrix(DataFile[, -1, drop = FALSE])))){
+            stop("Expression values must be finite (no NA/NaN/Inf).")
         }else if(length(unique(as.character(DataFile$gene))) != 
                 length(as.character(DataFile$gene))){
             stop("Gene identifiers must be unique. Check for duplicated
@@ -137,7 +147,7 @@ if(getRversion() >= "3.5"){
     OptionsPAdjust <- c("holm", "hochberg", "hommel", "bonferroni", "BH",
                         "BY","fdr")
     if  (!(tolower(PCorrectionMethod) %in% options)){
-        stop(paste("Correction method",PCorrectionMethod,"not found."))
+        stop(sprintf("Correction method %s not found.", PCorrectionMethod))
     }
     return(OptionsPAdjust[grep(tolower(PCorrectionMethod),options)])
 }
@@ -187,167 +197,199 @@ if(getRversion() >= "3.5"){
     return(DataFrameSpecies)
 }
 
+# nocov start
+.adam_normalize_species_id <- function(DBSpecies, DataFrameSpecies) {
+    SpeciesID <- DBSpecies
+    if (is.data.frame(SpeciesID) || file.exists(SpeciesID)) {
+        stop("Please inform a valid annotation package name!")
+    }
+    if (SpeciesID %in% DataFrameSpecies$DBSpeciesList) {
+        return(SpeciesID)
+    }
+
+    if (tolower(SpeciesID) == "eck12") {
+        SpeciesID <- "EcK12"
+    } else if (tolower(SpeciesID) == "ecsakai") {
+        SpeciesID <- "EcSakai"
+    } else if (tolower(SpeciesID) == "mmu") {
+        SpeciesID <- "Mmu"
+    } else {
+        SpeciesID <- unlist(strsplit(SpeciesID, ""))
+        SpeciesID <- paste0(
+            toupper(SpeciesID[1]),
+            paste0(tolower(SpeciesID[2:length(SpeciesID)]), collapse = "")
+        )
+    }
+    SpeciesMatch <- DataFrameSpecies$DBSpeciesList[
+        grep(SpeciesID, DataFrameSpecies$DBSpeciesList)
+    ]
+    SpeciesID <- ifelse(
+        length(SpeciesMatch) == 0,
+        DBSpecies,
+        as.character(SpeciesMatch)
+    )
+    if (!SpeciesID %in% DataFrameSpecies$DBSpeciesList) {
+        stop("Gene annotation package does not supported! Please check it.")
+    }
+    SpeciesID
+}
+
+.adam_load_expression_data <- function(GeneExpressionData) {
+    ExpressionData <- GeneExpressionData
+    if (!is.data.frame(GeneExpressionData)) {
+        ExpressionData <- read.table(
+            GeneExpressionData,
+            sep = "\t",
+            header = TRUE,
+            quote = "",
+            stringsAsFactors = FALSE
+        )
+    }
+    colnames(ExpressionData)[1] <- "gene"
+    ExpressionData
+}
+
+.adam_validate_gene_identifier <- function(GeneIdentifier, SpeciesID) {
+    GeneNomenclatures <- c("symbol", "entrez", "tair", "orf")
+    if (!GeneIdentifier %in% GeneNomenclatures) {
+        stop("Gene identifier invalid!")
+    }
+    if (GeneIdentifier == GeneNomenclatures[3] &&
+        SpeciesID != "org.At.tair.db") {
+        stop("Incorrect GeneIdentifier!")
+    }
+    if (GeneIdentifier == GeneNomenclatures[4] &&
+        SpeciesID != "org.Sc.sgd.db" &&
+        SpeciesID != "org.Pf.plasmo.db") {
+        stop("Incorrect GeneIdentifier!")
+    }
+}
+
+.adam_load_symbol_eg_list <- function(SpeciesID) {
+    if (SpeciesID == "org.At.tair.db") {
+        SymbolEGClass <- get("org.At.tairENTREZID", envir = asNamespace(SpeciesID))
+        SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(SymbolEGClass)]))
+        return(data.frame(tair = names(SymbolEGList), entrez = as.vector(SymbolEGList)))
+    }
+    if (SpeciesID == "org.Sc.sgd.db") {
+        SymbolEGClass <- get("org.Sc.sgdENTREZID", envir = asNamespace(SpeciesID))
+        SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(SymbolEGClass)]))
+        return(data.frame(orf = names(SymbolEGList), entrez = as.vector(SymbolEGList)))
+    }
+    if (SpeciesID == "org.Pf.plasmo.db") {
+        SymbolEGClass <- get("org.Pf.plasmoALIAS2ORF", envir = asNamespace(SpeciesID))
+        SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(SymbolEGClass)]))
+        return(data.frame(symbol = names(SymbolEGList), orf = as.vector(SymbolEGList)))
+    }
+
+    SymbolEGClass <- get(
+        paste0("org.", unlist(strsplit(SpeciesID, "[.]"))[2], ".egSYMBOL2EG"),
+        envir = asNamespace(SpeciesID)
+    )
+    SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(SymbolEGClass)]))
+    SymbolEGList <- data.frame(symbol = names(SymbolEGList), entrez = as.vector(SymbolEGList))
+    if (SpeciesID == "org.Ag.eg.db") {
+        GenesAg <- str_split(as.character(SymbolEGList[, 1]), "AgaP_")
+        GenesAg <- lapply(GenesAg, function(GeneNameAg) {
+            if (length(GeneNameAg) > 1) {
+                GeneNameAg[2]
+            } else {
+                GeneNameAg[1]
+            }
+        })
+        SymbolEGList$symbol <- unlist(GenesAg)
+    }
+    SymbolEGList
+}
+
+.adam_has_mapped_expression_genes <- function(ExpressionData, SymbolEGList, GeneIdentifier) {
+    GIColumn <- grep(tolower(GeneIdentifier), colnames(SymbolEGList))
+    if (length(GIColumn) == 0) {
+        return(FALSE)
+    }
+    sum(ifelse(
+        ExpressionData$gene %in% SymbolEGList[, c(GIColumn)] |
+            tolower(ExpressionData$gene) %in% SymbolEGList[, c(GIColumn)] |
+            toupper(ExpressionData$gene) %in% SymbolEGList[, c(GIColumn)],
+        1,
+        0
+    )) >= 1
+}
+
+.adam_load_own_db_file <- function(SpeciesID, ExpressionData) {
+    if (!is.data.frame(SpeciesID)) {
+        if (!file.exists(SpeciesID)) {
+            stop("Own functions file does not exist!")
+        }
+        DBFile <- read.table(
+            SpeciesID,
+            header = TRUE,
+            sep = "\t",
+            quote = "",
+            stringsAsFactors = FALSE
+        )
+    } else {
+        DBFile <- SpeciesID
+    }
+    colnames(DBFile) <- c("gene", "ID", "Description")
+    .checkDB(DBFile = DBFile, ExpressionData = ExpressionData)
+}
+
 .checkAnalysisDomain_DBSpecies_GeneIdentifier <- function(AnalysisDomain,
                                                         DBSpecies,
                                                         GeneIdentifier,
                                                         GeneExpressionData){
-    #Creates a data frame relating Species and gene annotation packages
     DataFrameSpecies <- .CreateDataSpecies()
-    
-    #Available domains
-    options <- c("gobp","gocc","gomf","kegg","own")
-    
-    #Available nomenclatures
-    GeneNomenclatures <- c("symbol","entrez","tair","orf")
-    
+    options <- c("gobp", "gocc", "gomf", "kegg", "own")
+
+    if (!(tolower(AnalysisDomain) %in% options)) {
+        stop(sprintf("Analysis domain %s does not exist!", AnalysisDomain))
+    }
+
     SpeciesID <- DBSpecies
-    if(!(tolower(AnalysisDomain) %in% options)){
-        stop(paste("Analysis domain",AnalysisDomain,"does not exist!"))
-    }else if(AnalysisDomain!=options[5]){
-        if(!is.data.frame(SpeciesID)){
-            if(!file.exists(SpeciesID)){
-                if(!SpeciesID %in% DataFrameSpecies$DBSpeciesList){
-                    if(tolower(SpeciesID)=="eck12"){
-                        SpeciesID <- "EcK12"
-                    }else if(tolower(SpeciesID)=="ecsakai"){
-                        SpeciesID <- "EcSakai"
-                    }else if(tolower(SpeciesID)=="mmu"){
-                        SpeciesID <- "Mmu"
-                    }else{
-                        SpeciesID <- unlist(strsplit(SpeciesID,""))
-                        SpeciesID <- paste0(toupper(SpeciesID[1]),
-                            paste0(tolower(SpeciesID[2:length(SpeciesID)]),
-                            collapse = ""))
-                    }
-                    SpeciesID <- ifelse(length(DataFrameSpecies$DBSpeciesList[
-                        grep(SpeciesID,DataFrameSpecies$DBSpeciesList)])==0,
-                        DBSpecies,
-                        as.character(DataFrameSpecies$DBSpeciesList[
-                        grep(SpeciesID,DataFrameSpecies$DBSpeciesList)]))
-                    if(!SpeciesID %in% DataFrameSpecies$DBSpeciesList){
-                        stop("Gene annotation package does not supported! 
-                            Please check it.")
-                    }
-                }
-            }else{
-                stop("Please inform a valid annotation package name!")
-            }
-        }else{
-            stop("Please inform a valid annotation package name!")
-        }
+    if (AnalysisDomain != options[5]) {
+        SpeciesID <- .adam_normalize_species_id(
+            DBSpecies = DBSpecies,
+            DataFrameSpecies = DataFrameSpecies
+        )
     }
 
-    ExpressionData <- GeneExpressionData
-    if(!(is.data.frame(GeneExpressionData))){
-        ExpressionData <- read.table(GeneExpressionData, sep = "\t",
-                                    header = TRUE, quote = "",
-                                    stringsAsFactors = FALSE)
-    }
-    colnames(ExpressionData)[1] <- "gene"
-    
-    if(tolower(AnalysisDomain)==options[5]){
-        if(!is.data.frame(SpeciesID)){
-            if(!file.exists(SpeciesID)){
-                stop("Own functions file does not exist!")
-            }else{
-                DBFile <- read.table(SpeciesID, header = TRUE,
-                                    sep = "\t", quote = "",
-                                    stringsAsFactors = FALSE)
-                colnames(DBFile) <- c("gene","ID","Description")
-                DBFile <- .checkDB(DBFile = DBFile,
-                        ExpressionData = ExpressionData)
-            }
-        }else{
-            DBFile <- SpeciesID
-            colnames(DBFile) <- c("gene","ID","Description")
-            DBFile <- .checkDB(DBFile=DBFile,
-                                ExpressionData = ExpressionData)
-        }
-    }else if(.checkPackage(NamePackage = SpeciesID)){
-            if(!GeneIdentifier %in% GeneNomenclatures){
-                stop("Gene identifier invalid!")
-            }else if(GeneIdentifier==GeneNomenclatures[3] & 
-                    SpeciesID!="org.At.tair.db"){
-                stop("Incorrect GeneIdentifier!")
-            }else if(GeneIdentifier==GeneNomenclatures[4] & 
-                    SpeciesID!="org.Sc.sgd.db" & 
-                    SpeciesID!="org.Pf.plasmo.db"){
-                    stop("Incorrect GeneIdentifier!")
-            }else{
-                if(SpeciesID=="org.At.tair.db"){
-                    SymbolEGClass <- org.At.tairENTREZID #EntrezID and tairID
-                    SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(
-                                    SymbolEGClass)]))
-                    SymbolEGList <-data.frame(tair=names(SymbolEGList),
-                                            entrez=as.vector(SymbolEGList))
-            }else if(SpeciesID=="org.Sc.sgd.db"){
-                    SymbolEGClass <- org.Sc.sgdENTREZID #EntrezID/ORF numbers
-                    SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(
-                                    SymbolEGClass)]))
-                    SymbolEGList <-data.frame(orf=names(SymbolEGList),
-                                    entrez=as.vector(SymbolEGList))
-            }else if(SpeciesID=="org.Pf.plasmo.db"){
-                    SymbolEGClass<-org.Pf.plasmoALIAS2ORF #GeneSymbol / ORF ID
-                    SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(
-                                    SymbolEGClass)]))
-                    SymbolEGList <-data.frame(symbol=names(SymbolEGList),
-                                    orf=as.vector(SymbolEGList))
-            }else{
-                SymbolEGClass <- get(paste0("org.",unlist(strsplit(SpeciesID,
-                                "[.]"))[2],".egSYMBOL2EG")) #GeneSymbol/Entrez
-                SymbolEGList <- unlist(as.list(SymbolEGClass[mappedkeys(
-                                SymbolEGClass)]))
-                SymbolEGList <-data.frame(symbol=names(SymbolEGList),
-                                entrez=as.vector(SymbolEGList))
-                
-                if(SpeciesID=="org.Ag.eg.db"){
-                    GenesAg<-str_split(as.character(SymbolEGList[,1]),"AgaP_")
-                    GenesAg <- lapply(GenesAg, function(GeneNameAg){
-                        if(length(GeneNameAg) > 1){
-                            return(GeneNameAg[2])
-                        }else{
-                            return(GeneNameAg[1])
-                        }
-                    })
-                    SymbolEGList$symbol <- unlist(GenesAg)
-                }
-            }
+    ExpressionData <- .adam_load_expression_data(GeneExpressionData)
 
-            if(sum(ifelse(ExpressionData$gene %in% 
-                            SymbolEGList[,c(grep(tolower(GeneIdentifier),
-                            colnames(SymbolEGList)))] |
-                            tolower(ExpressionData$gene) %in% 
-                            SymbolEGList[,c(grep(tolower(GeneIdentifier),
-                            colnames(SymbolEGList)))] |
-                            toupper(ExpressionData$gene) %in% 
-                            SymbolEGList[,c(grep(tolower(GeneIdentifier),
-                            colnames(SymbolEGList)))],1,0)) < 1){
-                stop("The genes in the Expression Data are not in the species 
-                    database. Check the gene identifiers!")
-            }else{
-                DBFile <- .checkGenesDomain(AnalysisDomain = 
-                                                    tolower(AnalysisDomain), 
-                DBSpecies = SpeciesID, 
-                IDGene = tolower(GeneIdentifier), 
-                ListGenes = SymbolEGList,
-                keggID=as.character(DataFrameSpecies$SpeciesID[grep(SpeciesID,
-                                    DataFrameSpecies$DBSpeciesList)]),
-                ExpressionData = ExpressionData)
-            }
+    if (tolower(AnalysisDomain) == options[5]) {
+        DBFile <- .adam_load_own_db_file(SpeciesID, ExpressionData)
+    } else if (.checkPackage(NamePackage = SpeciesID)) {
+        .adam_validate_gene_identifier(GeneIdentifier, SpeciesID)
+        SymbolEGList <- .adam_load_symbol_eg_list(SpeciesID)
+        if (!.adam_has_mapped_expression_genes(ExpressionData, SymbolEGList, GeneIdentifier)) {
+            stop("The genes in the Expression Data are not in the species database. Check the gene identifiers!")
         }
+        DBFile <- .checkGenesDomain(
+            AnalysisDomain = tolower(AnalysisDomain),
+            DBSpecies = SpeciesID,
+            IDGene = tolower(GeneIdentifier),
+            ListGenes = SymbolEGList,
+            keggID = as.character(DataFrameSpecies$SpeciesID[grep(
+                SpeciesID,
+                DataFrameSpecies$DBSpeciesList
+            )]),
+            ExpressionData = ExpressionData
+        )
     }
 
-    return(list(options[grep(tolower(AnalysisDomain),options)],DBFile[[1]],
-            DBFile[[2]], tolower(GeneIdentifier)))
+    return(list(
+        options[grep(tolower(AnalysisDomain), options)],
+        DBFile[[1]],
+        DBFile[[2]],
+        tolower(GeneIdentifier)
+    ))
 }
+# nocov end
 
 .checkPackage <- function(NamePackage){
-    if(!suppressMessages(requireNamespace(NamePackage))){
-        stop(paste("Annotation package",NamePackage,"not availlable.
-                    Please install it!"))
-    }else{
-        suppressMessages(require(NamePackage, character.only = TRUE,
-                                warn.conflicts = FALSE))
+    if(!requireNamespace(NamePackage, quietly = TRUE)){
+        stop(sprintf("Annotation package %s not available. Please install it!",
+                    NamePackage))
     }
     return(TRUE)
 }
@@ -401,141 +443,190 @@ if(getRversion() >= "3.5"){
     return(ListResult)
 }
 
+.adam_get_ontology_function <- function(DBSpecies) {
+    ListDBPackages <- list(
+        org.At.tair.db = c(
+            "org.At.tairGO2ALLTAIRS", "tair", "entrez", "org.At.tairPATH2TAIR"
+        ),
+        org.Sc.sgd.db = c(
+            "org.Sc.sgdGO2ALLORFS", "orf", "entrez", "org.Sc.sgdPATH2ORF"
+        ),
+        org.Pf.plasmo.db = c(
+            "org.Pf.plasmoGO2ALLORFS", "orf", "symbol", "org.Pf.plasmoPATH2ORF"
+        ),
+        otherDB = c(
+            paste0("org.", unlist(strsplit(DBSpecies, "[.]"))[2], ".egGO2ALLEGS"),
+            "entrez",
+            "symbol",
+            paste0("org.", unlist(strsplit(DBSpecies, "[.]"))[2], ".egPATH2EG")
+        )
+    )
+
+    if (DBSpecies %in% names(ListDBPackages)) {
+        ListDBPackages[[grep(DBSpecies, names(ListDBPackages))]]
+    } else {
+        ListDBPackages[[4]]
+    }
+}
+
+# nocov start
+.adam_build_kegg_terms <- function(OntologyFunction, keggID) {
+    keggPathways <- as.data.frame(keggList("pathway", keggID))
+    colnames(keggPathways)[1] <- "ID"
+    keggPathwaysID <- unlist(lapply(rownames(keggPathways), function(KPathway) {
+        unlist(strsplit(KPathway, paste0(":", keggID)))[2]
+    }))
+    keggPathwaysDescription <- unlist(
+        lapply(as.character(keggPathways$ID), function(KPathway) {
+            unlist(strsplit(KPathway, paste0("- ", keggID)))[1]
+        })
+    )
+
+    TermOntologies <- data.frame(
+        ID = keggPathwaysID,
+        Description = keggPathwaysDescription
+    )
+
+    DBKeggClass <- get(OntologyFunction[4])
+    DBFunctionsList <- as.list(DBKeggClass[mappedkeys(DBKeggClass)])
+    DBFunctionsList <- lapply(DBFunctionsList, function(DBFunction) {
+        unique(as.vector(DBFunction))
+    })
+    DBFunctionsList <- mapply(
+        .CheckTerm,
+        ListElement = DBFunctionsList,
+        ListElementName = names(DBFunctionsList),
+        MoreArgs = list(VectorTerms = as.character(TermOntologies$ID))
+    )
+
+    TermOntologies <- TermOntologies[
+        TermOntologies$ID %in% names(DBFunctionsList), ]
+    TermOntologies$ID <- paste0(keggID, TermOntologies$ID)
+    DBFunctionsList <- DBFunctionsList[lapply(DBFunctionsList, length) > 0]
+    names(DBFunctionsList) <- paste0(keggID, names(DBFunctionsList))
+
+    list(DBFunctionsList = DBFunctionsList, TermOntologies = TermOntologies)
+}
+
+.adam_build_go_terms <- function(OntologyFunction, AnalysisDomain) {
+    infoGO <- GOTERM
+    TermOntologies <- data.frame(t(vapply(infoGO, function(GOntology) {
+        c(trimws(GOID(GOntology)), trimws(Ontology(GOntology)), trimws(Term(GOntology)))
+    }, FUN.VALUE = character(3))))
+    TermOntologies <- subset(
+        TermOntologies,
+        TermOntologies$X2 == toupper(unlist(strsplit(AnalysisDomain, "go"))[2])
+    )
+    colnames(TermOntologies) <- c("ID", "Domain", "Description")
+    TermOntologies$Domain <- NULL
+    rownames(TermOntologies) <- NULL
+
+    DBFunctions <- get(OntologyFunction[1])
+    DBFunctionsList <- as.list(DBFunctions[mappedkeys(DBFunctions)])
+    DBFunctionsList <- lapply(DBFunctionsList, function(DBFunction) {
+        unique(as.vector(DBFunction))
+    })
+    DBFunctionsList <- mapply(
+        .CheckTerm,
+        ListElement = DBFunctionsList,
+        ListElementName = names(DBFunctionsList),
+        MoreArgs = list(VectorTerms = as.character(TermOntologies$ID))
+    )
+    DBFunctionsList <- DBFunctionsList[lapply(DBFunctionsList, length) > 0]
+
+    list(DBFunctionsList = DBFunctionsList, TermOntologies = TermOntologies)
+}
+# nocov end
+
+.adam_build_domain_lists <- function(
+    DBFunctionsList,
+    TermOntologies,
+    ExpressionData,
+    AnalysisDomain
+) {
+    TermOntologies <- subset(
+        TermOntologies,
+        TermOntologies$ID %in% names(DBFunctionsList)
+    )
+    DBFunctionsListSample <- lapply(
+        DBFunctionsList,
+        function(ListElement, SampleGenes) {
+            SampleGenes[SampleGenes %in% ListElement]
+        },
+        SampleGenes = ExpressionData$gene
+    )
+
+    CheckSample <- DBFunctionsListSample[lapply(DBFunctionsListSample, length) > 0]
+    if (length(CheckSample) == 0) {
+        stop(
+            sprintf(
+                "Genes in the Expression Data file are not related to any %s term.",
+                AnalysisDomain
+            ),
+            " Please check the genes in your sample!"
+        )
+    }
+
+    names(DBFunctionsListSample) <- vapply(
+        names(DBFunctionsList),
+        function(ListElement, TermOntologyData) {
+            SubTermOntologies <- subset(
+                TermOntologyData,
+                TermOntologyData$ID == ListElement
+            )
+            paste0(
+                as.character(SubTermOntologies$ID),
+                " <==> ",
+                as.character(SubTermOntologies$Description)
+            )
+        },
+        TermOntologyData = TermOntologies,
+        FUN.VALUE = character(1)
+    )
+
+    DBFunctionsListRaw <- lapply(DBFunctionsList, function(ListElement) {
+        length(ListElement)
+    })
+    names(DBFunctionsListRaw) <- names(DBFunctionsList)
+    DBFunctionsListSample <- DBFunctionsListSample[lapply(DBFunctionsListSample, length) > 0]
+
+    list(
+        DBFunctionsListSample = DBFunctionsListSample,
+        DBFunctionsListRaw = DBFunctionsListRaw
+    )
+}
+
 .checkGenesDomain<-function(AnalysisDomain,DBSpecies,IDGene,ListGenes,keggID,
                             ExpressionData){
+    OntologyFunction <- .adam_get_ontology_function(DBSpecies)
 
-    #Each annotation package has its own set of functions that relates genes
-    #to ontologies and kegg pathways. This way, we create a list linking the 
-    #package to its functions. Besides that, the list also presents the 
-    #default and alternative nomenclature supported according to each DB 
-    #species. For example, let's consider Arabdopsis thaliana: List element
-    #name: org.At.tair.db; Function to relate genes to gene ontologies terms:
-    #org.At.tairGO2ALLTAIRS; Default gene nomenclature: "tair" ID;
-    #Alternative gene nomenclature: "entrez" ID; Function to relate genes to
-    #kegg pathways: org.At.tairARACYC.
-    ListDBPackages <- list(org.At.tair.db = c("org.At.tairGO2ALLTAIRS","tair",
-                                            "entrez","org.At.tairPATH2TAIR"),
-                org.Sc.sgd.db = c("org.Sc.sgdGO2ALLORFS","orf",
-                                "entrez","org.Sc.sgdPATH2ORF"),
-                org.Pf.plasmo.db = c("org.Pf.plasmoGO2ALLORFS","orf",
-                                "symbol","org.Pf.plasmoPATH2ORF"),
-                otherDB=c(paste0("org.",unlist(strsplit(DBSpecies,"[.]"))[2],
-                        ".egGO2ALLEGS"),"entrez","symbol",
-                        paste0("org.",unlist(strsplit(DBSpecies,"[.]"))[2],
-                        ".egPATH2EG")))
-
-    if(DBSpecies %in% names(ListDBPackages)){
-        OntologyFunction <- c(ListDBPackages[[grep(DBSpecies,names(
-                            ListDBPackages))]][1],
-                            ListDBPackages[[grep(DBSpecies,names(
-                            ListDBPackages))]][2],
-                            ListDBPackages[[grep(DBSpecies,names(
-                            ListDBPackages))]][3],
-                            ListDBPackages[[grep(DBSpecies,names(
-                            ListDBPackages))]][4])
-    }else{
-        OntologyFunction <- c(ListDBPackages[[4]][1],ListDBPackages[[4]][2],
-        ListDBPackages[[4]][3],ListDBPackages[[4]][4])
+    if (AnalysisDomain == "kegg") {
+        DomainData <- .adam_build_kegg_terms(OntologyFunction, keggID)
+    } else {
+        DomainData <- .adam_build_go_terms(OntologyFunction, AnalysisDomain)
     }
 
-    if(AnalysisDomain == "kegg"){
-        keggPathways <- as.data.frame(keggList("pathway", keggID))
-        colnames(keggPathways)[1] <- "ID"
-        keggPathwaysID <- unlist(lapply(rownames(keggPathways),
-                        function(KPathway)
-                        unlist(strsplit(KPathway,paste0(":",keggID)))[2]))
-        
-        keggPathwaysDescription<-unlist(lapply(as.character(keggPathways$ID),
-                                function(KPathway) unlist(strsplit(KPathway,
-                                paste0("- ",keggID)))[1]))
-        
-        TermOntologies <- data.frame(ID = keggPathwaysID, 
-                                    Description = keggPathwaysDescription)
+    DBFunctionsList <- DomainData$DBFunctionsList
+    TermOntologies <- DomainData$TermOntologies
 
-
-        DBKeggClass <- get(OntologyFunction[4])
-        
-        DBFunctionsList <- as.list(DBKeggClass[mappedkeys(DBKeggClass)])
-
-        DBFunctionsList <- lapply(DBFunctionsList, function(DBFunction) 
-                                unique(as.vector(DBFunction)))
-        
-        DBFunctionsList <- mapply(.CheckTerm, ListElement = DBFunctionsList, 
-                                ListElementName = names(DBFunctionsList),
-                                MoreArgs =  list(VectorTerms = 
-                                as.character(TermOntologies$ID)))
-
-        TermOntologies <- TermOntologies[TermOntologies$ID %in% 
-                            names(DBFunctionsList),]
-        TermOntologies$ID <- paste0(keggID,TermOntologies$ID)
-
-        DBFunctionsList<-DBFunctionsList[lapply(DBFunctionsList, length) > 0]
-        names(DBFunctionsList) <- paste0(keggID,names(DBFunctionsList))
-    }else{
-        infoGO <- GOTERM
-        TermOntologies <- data.frame(t(vapply(infoGO, function(GOntology) 
-                    c(trimws(GOID(GOntology)), trimws(Ontology(GOntology)), 
-                    trimws(Term(GOntology))), FUN.VALUE = character(3))))
-
-        TermOntologies <- subset(TermOntologies, TermOntologies$X2 == 
-                            toupper(unlist(strsplit(AnalysisDomain,"go"))[2]))
-        colnames(TermOntologies) <- c("ID","Domain","Description")
-        TermOntologies$Domain <- NULL
-        rownames(TermOntologies) <- NULL
-
-        DBFunctions <- get(OntologyFunction[1])
-        DBFunctionsList <- as.list(DBFunctions[mappedkeys(DBFunctions)])
-        DBFunctionsList <- lapply(DBFunctionsList, function(DBFunction)
-                            unique(as.vector(DBFunction)))
-        DBFunctionsList <- mapply(.CheckTerm, ListElement = DBFunctionsList,
-                            ListElementName = names(DBFunctionsList),
-                            MoreArgs =  list(VectorTerms = 
-                            as.character(TermOntologies$ID)))
-        DBFunctionsList<-DBFunctionsList[lapply(DBFunctionsList, length) > 0]
+    if (IDGene != OntologyFunction[2]) {
+        DBFunctionsList <- lapply(
+            DBFunctionsList,
+            FUN = .GeneIDConversion,
+            ListGenes = ListGenes,
+            StandardGeneID = OntologyFunction[2],
+            AlternativeGeneID = OntologyFunction[3]
+        )
     }
 
-    if(IDGene != OntologyFunction[2]){
-        DBFunctionsList <- lapply(DBFunctionsList, FUN = .GeneIDConversion, 
-                            ListGenes = ListGenes,
-                            StandardGeneID = OntologyFunction[2], 
-                            AlternativeGeneID = OntologyFunction[3])
-    }
+    DomainLists <- .adam_build_domain_lists(
+        DBFunctionsList = DBFunctionsList,
+        TermOntologies = TermOntologies,
+        ExpressionData = ExpressionData,
+        AnalysisDomain = AnalysisDomain
+    )
 
-    TermOntologies <- subset(TermOntologies, TermOntologies$ID %in%
-                        names(DBFunctionsList))
-
-    DBFunctionsListSample <- lapply(DBFunctionsList, 
-                            function(ListElement,SampleGenes){
-                            SampleGenes[SampleGenes %in% 
-                            ListElement]},
-                            SampleGenes = ExpressionData$gene)
-
-    CheckSample<-DBFunctionsListSample[lapply(DBFunctionsListSample,
-                                                        length) > 0]
-    
-    if(length(CheckSample) == 0){
-        stop(paste("Genes in the Expression Data file are not related to any",
-                   AnalysisDomain,"term. Please check the genes in your
-                   sample!"))
-    }
-    
-    names(DBFunctionsListSample) <- vapply(names(DBFunctionsList),
-                function(ListElement,TermOntologies){
-                SubTermOntologies<-subset(TermOntologies, 
-                            TermOntologies$ID==ListElement)
-                return(paste0(as.character(SubTermOntologies$ID),
-                    " <==> ",as.character(SubTermOntologies$Description)))},
-                TermOntologies=TermOntologies, FUN.VALUE = character(1))
-
-    
-    DBFunctionsListRaw <- lapply(DBFunctionsList,function(ListElement){
-                                length(ListElement)})
-    names(DBFunctionsListRaw) <- names(DBFunctionsList)
-
-    DBFunctionsListSample<-DBFunctionsListSample[lapply(DBFunctionsListSample,
-                                                length) > 0]
-
-    return(list(DBFunctionsListSample,DBFunctionsListRaw))
+    list(DomainLists$DBFunctionsListSample, DomainLists$DBFunctionsListRaw)
 }
 
 .CheckTerm <- function(ListElement,ListElementName,VectorTerms){
@@ -554,4 +645,3 @@ if(getRversion() >= "3.5"){
     return(as.character(SubListGenes[,grep(AlternativeGeneID,
         colnames(SubListGenes))]))
 }
-

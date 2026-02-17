@@ -1,0 +1,13 @@
+# R package build artifacts
+*.Rcheck/
+*.tar.gz
+
+# RStudio / editor
+.Rproj.user/
+.DS_Store
+
+# Compiled objects and shared libraries
+src/*.o
+src/*.so
+src/*.dll
+src/*.dylib

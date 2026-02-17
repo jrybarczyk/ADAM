@@ -2,6 +2,8 @@
 #' @description A sample fragment of gene expression from an RNA-seq 
 #' experiment of Aedes aegypti mosquito.
 #' @format A data frame with 34 rows and 5 variables
+#' @return A data frame containing gene identifiers in the first column and
+#' expression values for comparative samples in the remaining columns.
 #' @name ExpressionAedes
 #' @references AKBARI, O. S. et al. The developmental transcriptome of the 
 #' mosquito aedes aegypti, an invasive species and major arbovirus vector. G3:
@@ -16,6 +18,8 @@ NULL
 #' @description A relation between the genes in the ExpressionAedes data and
 #' their respective KEGG pathways (GFAGs).
 #' @format A data frame with 200 rows and 2 variables
+#' @return A data frame mapping gene identifiers to KEGG pathway IDs used as
+#' input for ADAM analyses.
 #' @name KeggPathwaysAedes
 #' @references Molan, A. L. 2018. “Construction of a Tool for Multispecies
 #' Genic Functional Enrichment Analysis Among Comparative Samples.”

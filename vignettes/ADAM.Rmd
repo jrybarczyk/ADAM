@@ -1,6 +1,8 @@
 ---
 title: "ADAM: Activity and Diversity Analysis Module"
-author: "André L. Molan, Giordano B. S. Seco, Agnes A. S. Takeda, Jose L. Rybarczyk-Filho"
+author: >
+  André L. Molan, Giordano B. S. Seco, Agnes A. S. Takeda,
+  Jose L. Rybarczyk-Filho
 date: "`r doc_date()`"
 package: "`r pkg_ver('ADAM')`"
 bibliography: bibliography.bib
@@ -9,7 +11,7 @@ output:
     BiocStyle::html_document:
         css: custom.css
 vignette: >
-    %\VignetteIndexEntry{"Using ADAM"}
+    %\VignetteIndexEntry{"ADAM"}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
@@ -46,11 +48,11 @@ them.
 arguments. As an example, lets consider a gene expression set of 
 *Aedes aegypti*:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-load-package, eval=TRUE, out.height.px=6, out.width.px=6}
 suppressMessages(library(ADAM))
 ```
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-show-expression, eval=TRUE, out.height.px=6, out.width.px=6}
 data("ExpressionAedes")
 head(ExpressionAedes)
 ```
@@ -60,14 +62,14 @@ obtained by a specific experiment (in this case, RNA-seq). ADAM
 always need two samples (control *versus* experiment). This way, we must 
 select two sample columns from the expression data for each comparison:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-define-comparisons, eval=TRUE, out.height.px=6, out.width.px=6}
 Comparison <- c("control1,experiment1","control2,experiment2")
 ```
 
 Each GFAG has a number of genes associated to it. This way, the analysis can 
 consider all GFAGs or just those with a certain number of genes:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-define-min-max, eval=TRUE, out.height.px=6, out.width.px=6}
 Minimum <- 3
 Maximum <- 20
 ```
@@ -77,7 +79,7 @@ demands a seed for generating random numbers and a number of bootstraps steps
 (the number of bootstraps should be a value that ensures the p-value 
 precision):
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-define-bootstrap, eval=TRUE, out.height.px=6, out.width.px=6}
 SeedBootstrap <- 1049
 StepsBootstrap <- 1000
 ```
@@ -85,7 +87,7 @@ StepsBootstrap <- 1000
 The p-values will be corrected by a specific method with a certain cutoff 
 value:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-define-correction, eval=TRUE, out.height.px=6, out.width.px=6}
 CutoffValue <- 0.05
 MethodCorrection <- "fdr"
 ```
@@ -95,7 +97,7 @@ necessary an annotation package or a file relating genes and functions. In this
 case, *Aedes aegypti* doesn't have an annotation package. This way, we build our
 own file:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-load-kegg, eval=TRUE, out.height.px=6, out.width.px=6}
 data("KeggPathwaysAedes")
 head(KeggPathwaysAedes)
 ```
@@ -104,21 +106,21 @@ It's necessary to inform which function domain and gene nomenclature are being
 used. As *Aedes agypti* doesn't have an annotation package, the domain will be 
 "own" and the nomenclature "gene":
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-define-domain-id, eval=TRUE, out.height.px=6, out.width.px=6}
 Domain <- "own"
 Nomenclature <- "geneStableID"
 ```
 
 Wilcoxon rank sum test and Fisher's exact test will be run:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-enable-tests, eval=TRUE, out.height.px=6, out.width.px=6}
 Wilcoxon <- TRUE
 Fisher <- TRUE
 ```
 
 As all arguments were defined, then we can run GFAGAnalysis function:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-run-analysis, eval=TRUE, out.height.px=6, out.width.px=6}
 ResultAnalysis <- suppressMessages(GFAGAnalysis(ComparisonID = Comparison, 
                             ExpressionData = ExpressionAedes,
                             MinGene = Minimum,
@@ -139,14 +141,14 @@ showing messages during the *GFAGAnalysis* function execution. The output of
 *GFAGAnalysis* will be a *list* with two elements. The first corresponds to a
 *data frame* showing genes and their respective functions:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-output-genes, eval=TRUE, out.height.px=6, out.width.px=6}
 head(ResultAnalysis[[1]])
 ```
 
 The second element of the output list result corresponds to data frames
 according to the argument ComparisonID:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r gfag-output-comparisons, eval=TRUE, out.height.px=6, out.width.px=6}
 DT::datatable(as.data.frame(ResultAnalysis[[2]][1]), width = 800,
             options = list(scrollX = TRUE))
 DT::datatable(as.data.frame(ResultAnalysis[[2]][2]), width = 800, 
@@ -209,7 +211,7 @@ gene diversity and activity of each GFAG with no signicance by bootstrap,
 Wilcoxon or Fisher. As an example, lets consider the same gene expression set
 of *Aedes aegypti* previously used in *GFAGAnalysis* funcion example:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r ad-load-data, eval=TRUE, out.height.px=6, out.width.px=6}
 suppressMessages(library(ADAM))
 data("ExpressionAedes")
 data("KeggPathwaysAedes")
@@ -219,7 +221,7 @@ As ADAM always need two samples (control *versus* experiment), let's select
 two sample columns from the expression data and define minimum and maximum 
 number of genes per GFAG:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r ad-define-comparison, eval=TRUE, out.height.px=6, out.width.px=6}
 Comparison <- c("control1,experiment1")
 Minimum <- 3
 Maximum <- 100
@@ -228,7 +230,7 @@ Maximum <- 100
 *Aedes aegypti* doesn't have an annotation package. This way, we build our own
 file:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r ad-define-species, eval=TRUE, out.height.px=6, out.width.px=6}
 SpeciesID <- "KeggPathwaysAedes"
 ```
 
@@ -236,14 +238,14 @@ It's necessary to inform which function domain and gene nomenclature are being
 used. *Aedes agypti* doesn't have an annotation package. So the domain will be 
 "own" and the nomenclature "geneStableID":
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r ad-define-domain-id, eval=TRUE, out.height.px=6, out.width.px=6}
 Domain <- "own"
 Nomenclature <- "geneStableID"
 ```
 
 As all arguments were defined, then we can run ADAnalysis function:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r ad-run-analysis, eval=TRUE, out.height.px=6, out.width.px=6}
 ResultAnalysis <- suppressMessages(ADAnalysis(ComparisonID = Comparison, 
                             ExpressionData = ExpressionAedes,
                             MinGene = Minimum,
@@ -258,14 +260,14 @@ showing messages during the *ADAnalysis* function execution. The output of
 *ADAnalysis* will be a *list* with two elements. The first corresponds to a
 *data frame* showing genes and their respective functions:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r ad-output-genes, eval=TRUE, out.height.px=6, out.width.px=6}
 head(ResultAnalysis[[1]])
 ```
 
 The second element of the output list result corresponds to data frames
 according to the argument ComparisonID:
 
-```{r eval=TRUE, out.height.px=6, out.width.px=6}
+```{r ad-output-comparison, eval=TRUE, out.height.px=6, out.width.px=6}
 DT::datatable(as.data.frame(ResultAnalysis[[2]][1]), width = 800, 
             options = list(scrollX = TRUE))
 ```
@@ -291,7 +293,7 @@ of each sample (control *versus* experiment).</div>
 
 # Session information
 
-```{r, eval=TRUE, out.height.px=6, out.width.px=6, label='Session information', , echo=FALSE}
+```{r session-information, eval=TRUE, echo=FALSE}
 sessionInfo()
 ```
 

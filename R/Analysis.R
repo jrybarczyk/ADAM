@@ -111,22 +111,46 @@
 #' analysis, according to ComparisonID argument.
 #' @examples
 #' ##
-#' #Complete Analysis with Aedes aetypti through GFAGAnalysis function
+#' #Complete analysis with Aedes aegypti through GFAGAnalysis function
 #' ##
 #' data(ExpressionAedes)
 #' data(KeggPathwaysAedes)
-#' ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
-#' "control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 3L,
-#' MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 1000L,
+#' ResultAnalysis <- GFAGAnalysis(
+#' ComparisonID = c("control1,experiment1"), ExpressionData = ExpressionAedes,
+#' MinGene = 3L, MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 50L,
 #' PCorrection = 0.05, DBSpecies = KeggPathwaysAedes,
-#' PCorrectionMethod = "fdr", WilcoxonTest = TRUE, FisherTest = TRUE,
-#' AnalysisDomain = "own", GeneIdentifier = "gene")
-#' \dontrun{
+#' PCorrectionMethod = "fdr", WilcoxonTest = FALSE, FisherTest = FALSE,
+#' AnalysisDomain = "own", GeneIdentifier = "geneStableID")
 #' head(ResultAnalysis[[1]]) #Relation between genes and functions
 #' head(ResultAnalysis[[2]][1]) #Result comparison 1
-#' head(ResultAnalysis[[2]][2]) #Result comparison 2
-#' }
 #' @export
+
+.adam_build_genes_file <- function(DBSpeciesFunctionsSample) {
+    genes_file <- as.data.frame(do.call(rbind, lapply(
+        DBSpeciesFunctionsSample,
+        function(DBFunctionsSample) {
+            as.data.frame(as.vector(unlist(DBFunctionsSample)))
+        }
+    )))
+    genes_file$GroupID <- row.names(genes_file)
+    group_id <- data.frame(do.call(
+        "rbind",
+        strsplit(as.character(genes_file$GroupID), "<==>", fixed = TRUE)
+    ))
+    rownames(genes_file) <- NULL
+    colnames(genes_file) <- c("gene", "GroupID")
+    genes_file$GroupID <- trimws(group_id$X1)
+    unique(genes_file)
+}
+
+.adam_run_analysis <- function(ECGObject, completeTest) {
+    lapply(
+        ECGObject@ComparisonID,
+        FUN = makeAnalysis,
+        ECGObject = ECGObject,
+        completeTest = completeTest
+    )
+}
 
 GFAGAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL,
                         MinGene = 3, MaxGene = 2000, SeedNumber = 1049,
@@ -135,37 +159,27 @@ GFAGAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL,
                         WilcoxonTest = FALSE, FisherTest = FALSE,
                         AnalysisDomain = NULL, GeneIdentifier = NULL){
     message("Creating object ...")
-    
-    ECGObject <- ECGMainData(ComparisonID = ComparisonID, ExpressionData =
-                                ExpressionData, MinGene = MinGene,
-                                MaxGene = MaxGene,
-                                SeedNumber = SeedNumber, BootstrapNumber = 
-                                BootstrapNumber, PCorrection = PCorrection,
-                                DBSpecies = DBSpecies, PCorrectionMethod = 
-                                PCorrectionMethod, WilcoxonTest=WilcoxonTest,
-                                FisherTest = FisherTest, AnalysisDomain =
-                                AnalysisDomain,
-                                GeneIdentifier = GeneIdentifier,
-                                completeTest = TRUE)
-    #GFAG Analysis
-    ResultAnalysis <- lapply(ECGObject@ComparisonID, FUN = makeAnalysis,
-                            ECGObject = ECGObject, completeTest = TRUE)
-    
-    #File relating genes and functions
-    GenesFile <- as.data.frame(do.call(rbind,
-                lapply(ECGObject@DBSpeciesFunctionsSample,
-                    function(DBFunctionsSample){
-                    as.data.frame(as.vector(unlist(DBFunctionsSample)))})))
-    GenesFile$GroupID  <- row.names(GenesFile)
-    GroupID <- data.frame(do.call('rbind',
-                        strsplit(as.character(GenesFile$GroupID),
-                        '<==>',fixed=TRUE)))
-    rownames(GenesFile) <- NULL
-    colnames(GenesFile) <- c("gene","GroupID")
-    GenesFile$GroupID <- trimws(GroupID$X1)
-    GenesFile <- unique(GenesFile)
 
-    return(list(GenesFile,ResultAnalysis))
+    ECGObject <- ECGMainData(
+        ComparisonID = ComparisonID,
+        ExpressionData = ExpressionData,
+        MinGene = MinGene,
+        MaxGene = MaxGene,
+        SeedNumber = SeedNumber,
+        BootstrapNumber = BootstrapNumber,
+        PCorrection = PCorrection,
+        DBSpecies = DBSpecies,
+        PCorrectionMethod = PCorrectionMethod,
+        WilcoxonTest = WilcoxonTest,
+        FisherTest = FisherTest,
+        AnalysisDomain = AnalysisDomain,
+        GeneIdentifier = GeneIdentifier,
+        completeTest = TRUE
+    )
+    ResultAnalysis <- .adam_run_analysis(ECGObject, completeTest = TRUE)
+    GenesFile <- .adam_build_genes_file(ECGObject@DBSpeciesFunctionsSample)
+
+    return(list(GenesFile, ResultAnalysis))
 }
 
 #' @title Group of Functionally Associated Genes (GFAG) partial analysis
@@ -250,45 +264,31 @@ GFAGAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL,
 #' ##
 #' #Partial Analysis with Aedes aegypti through ADAnalysis function
 #' ##
-#' data(ExpressionHs)
+#' data(ExpressionAedes)
+#' data(KeggPathwaysAedes)
 #' ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
 #' ExpressionData = ExpressionAedes, MinGene = 3L, MaxGene = 20L, 
 #' DBSpecies = KeggPathwaysAedes, AnalysisDomain = "own",
 #' GeneIdentifier = "geneStableID")
-#' \dontrun{
 #' head(ResultAnalysis[[1]]) #Relation between genes and functions
 #' head(ResultAnalysis[[2]][1]) #Result comparison 1
-#' }
 #' @export
-ADAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL, MinGene=3,
-                    MaxGene=2000, DBSpecies = NULL, AnalysisDomain = NULL,
+ADAnalysis <- function(ComparisonID = NULL, ExpressionData = NULL, MinGene = 3,
+                    MaxGene = 2000, DBSpecies = NULL, AnalysisDomain = NULL,
                     GeneIdentifier = NULL){
     message("Creating object ...")
-    ECGObject <- ECGMainData(ComparisonID = ComparisonID, 
-                            ExpressionData = ExpressionData, 
-                            MinGene = MinGene,
-                            MaxGene = MaxGene, DBSpecies = DBSpecies, 
-                            AnalysisDomain = AnalysisDomain,
-                            GeneIdentifier = GeneIdentifier,
-                            completeTest = FALSE)
-    
-    #GFAG Analysis
-    ResultAnalysis <- lapply(ECGObject@ComparisonID, FUN = makeAnalysis,
-                            ECGObject = ECGObject, completeTest = FALSE)
-    
-    #File relating genes and functions
-    GenesFile <- as.data.frame(do.call(rbind,
-                    lapply(ECGObject@DBSpeciesFunctionsSample,
-                    function(DBFunctionsSample){
-                    as.data.frame(as.vector(unlist(DBFunctionsSample)))})))
-    GenesFile$GroupID  <- row.names(GenesFile)
-    GroupID <- data.frame(do.call('rbind', 
-                                strsplit(as.character(GenesFile$GroupID),
-                                '<==>',fixed=TRUE)))
-    rownames(GenesFile) <- NULL
-    colnames(GenesFile) <- c("gene","GroupID")
-    GenesFile$GroupID <- trimws(GroupID$X1)
-    GenesFile <- unique(GenesFile)
+    ECGObject <- ECGMainData(
+        ComparisonID = ComparisonID,
+        ExpressionData = ExpressionData,
+        MinGene = MinGene,
+        MaxGene = MaxGene,
+        DBSpecies = DBSpecies,
+        AnalysisDomain = AnalysisDomain,
+        GeneIdentifier = GeneIdentifier,
+        completeTest = FALSE
+    )
+    ResultAnalysis <- .adam_run_analysis(ECGObject, completeTest = FALSE)
+    GenesFile <- .adam_build_genes_file(ECGObject@DBSpeciesFunctionsSample)
 
-    return(list(GenesFile,ResultAnalysis))
+    return(list(GenesFile, ResultAnalysis))
 }

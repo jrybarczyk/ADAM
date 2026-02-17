@@ -2,6 +2,7 @@
 
 export(ADAnalysis)
 export(GFAGAnalysis)
+export(run_adam)
 import(GO.db)
 import(KEGGREST)
 import(Rcpp)

@@ -1,0 +1,46 @@
+name: ADAM-Benchmark
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  benchmark:
+    name: Benchmark Assert (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::BiocManager
+            local::.
+
+      - name: Run benchmark scenarios (aedes)
+        shell: bash
+        run: |
+          bash scripts/benchmark/run_dataset_compare_pipeline.sh aedes partial benchmark_results 200 3000 first
+          bash scripts/benchmark/run_dataset_compare_pipeline.sh aedes complete benchmark_results 200 3000 first
+
+      - name: Build consolidated benchmark report
+        shell: bash
+        run: |
+          Rscript scripts/benchmark/build_consolidated_report.R benchmark_results
+
+      - name: Benchmark assertion
+        shell: bash
+        run: |
+          Rscript scripts/benchmark/benchmark_assert.R --outdir benchmark_results
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            benchmark_results/*.csv
+            benchmark_results/*.md

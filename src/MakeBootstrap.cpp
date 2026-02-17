@@ -1,19 +1,20 @@
 #include <Rcpp.h>
-#include <random>
+#include <cmath>
 
 using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericMatrix MakeBootstrap(NumericMatrix BootstrapData, int BootstrapNumber, 
                             int BootstrapGroupSize, double BootstrapSeed) {
-    int k = 0;
     int StartRow = 0;
     double SumExperiment=0, SumControl=0, pExperiment = 0, pControl = 0;
     double HControl=0, HExperiment=0, h=0, n=0;
     NumericMatrix out(BootstrapGroupSize,2);
     NumericMatrix result(BootstrapNumber,2);
-    
-    srand(BootstrapSeed);
+
+    Rcpp::Function set_seed("set.seed");
+    set_seed(BootstrapSeed);
+    GetRNGstate();
     
     for(int i=0; i<BootstrapNumber; i++){
         SumControl = 0;
@@ -22,10 +23,10 @@ NumericMatrix MakeBootstrap(NumericMatrix BootstrapData, int BootstrapNumber,
         pExperiment = 0;
         
         for(int j=0; j<BootstrapGroupSize; j++){
-            StartRow = rand() % BootstrapGroupSize;
+            StartRow = static_cast<int>(std::floor(R::unif_rand() *
+                                                    BootstrapGroupSize));
             out(j,0) = BootstrapData(StartRow,0);
             out(j,1) = BootstrapData(StartRow,1);
-            k+=1;
             SumControl += out(j,0);
             SumExperiment += out(j,1);
         }
@@ -59,5 +60,6 @@ NumericMatrix MakeBootstrap(NumericMatrix BootstrapData, int BootstrapNumber,
         result(i,0) = h;
         result(i,1) = n;
     }
+    PutRNGstate();
     return result;
 }

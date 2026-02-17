@@ -11,6 +11,10 @@ A data frame with 200 rows and 2 variables
 A relation between the genes in the ExpressionAedes data and
 their respective KEGG pathways (GFAGs).
 }
+\value{
+A data frame mapping gene identifiers to KEGG pathway IDs used as input for
+ADAM analyses.
+}
 \examples{
 data(KeggPathwaysAedes)
 }

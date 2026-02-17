@@ -119,21 +119,19 @@ and siginificative groups can be seen through them.
 }
 \examples{
 ##
-#Complete Analysis with Aedes aetypti through GFAGAnalysis function
+#Complete analysis with Aedes aegypti through GFAGAnalysis function
 ##
 data(ExpressionAedes)
 data(KeggPathwaysAedes)
-ResultAnalysis <- GFAGAnalysis(ComparisonID = c("control1,experiment1", 
-"control2,experiment2"), ExpressionData = ExpressionAedes, MinGene = 3L,
-MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 1000L,
+ResultAnalysis <- GFAGAnalysis(
+ComparisonID = c("control1,experiment1"), ExpressionData = ExpressionAedes,
+MinGene = 3L, MaxGene = 20L, SeedNumber = 1049, BootstrapNumber = 50L,
 PCorrection = 0.05, DBSpecies = KeggPathwaysAedes,
-PCorrectionMethod = "fdr", WilcoxonTest = TRUE, FisherTest = TRUE,
-AnalysisDomain = "own", GeneIdentifier = "gene")
-\dontrun{
+PCorrectionMethod = "fdr", WilcoxonTest = FALSE, FisherTest = FALSE,
+AnalysisDomain = "own", GeneIdentifier = "geneStableID")
 head(ResultAnalysis[[1]]) #Relation between genes and functions
 head(ResultAnalysis[[2]][1]) #Result comparison 1
-head(ResultAnalysis[[2]][2]) #Result comparison 2
-}
+
 }
 \references{
 CASTRO, M. A., RYBARCZYK-FILHO, J. L., et al. Viacomplex:

@@ -1,0 +1,7 @@
+^\.github($|/)
+^log_adam\.txt$
+^ADAM\.Rcheck$
+^\.\.?Rcheck$
+^ADAM\.BiocCheck$
+^benchmark_results($|/)
+^scripts($|/)

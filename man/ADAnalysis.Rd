@@ -100,10 +100,8 @@ ResultAnalysis <- ADAnalysis(ComparisonID = c("control1,experiment1"),
 ExpressionData = ExpressionAedes, MinGene = 3L, MaxGene = 20L, 
 DBSpecies = KeggPathwaysAedes, AnalysisDomain = "own",
 GeneIdentifier = "geneStableID")
-\dontrun{
 head(ResultAnalysis[[1]]) #Relation between genes and functions
 head(ResultAnalysis[[2]][1]) #Result comparison 1
-}
 }
 \references{
 CASTRO, M. A., RYBARCZYK-FILHO, J. L., et al. Viacomplex:

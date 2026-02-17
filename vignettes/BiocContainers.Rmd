@@ -1,0 +1,112 @@
+---
+title: "ADAM with Bioconductor Containers"
+author: "ADAM maintainers"
+output:
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{ADAM with Bioconductor Containers}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+## Overview
+
+`run_adam()` is the recommended interface when your data is already organized
+as Bioconductor containers.
+
+Supported inputs:
+
+- `SummarizedExperiment`
+- `SingleCellExperiment`
+- `ExpressionSet`
+- legacy `data.frame`/file inputs
+
+This vignette shows compact end-to-end examples using package datasets.
+
+## SummarizedExperiment (bulk-like)
+
+```{r se-example}
+library(ADAM)
+library(SummarizedExperiment)
+data("ExpressionAedes", package = "ADAM")
+data("KeggPathwaysAedes", package = "ADAM")
+
+expr <- as.matrix(ExpressionAedes[, -1])
+rownames(expr) <- as.character(ExpressionAedes$gene)
+
+col_data <- S4Vectors::DataFrame(
+  condition = c("control", "experiment", "control", "experiment"),
+  row.names = colnames(expr)
+)
+
+se <- SummarizedExperiment(
+  assays = list(counts = expr),
+  colData = col_data
+)
+
+res_se <- suppressMessages(run_adam(
+  x = se,
+  mode = "partial",
+  assay_name = "counts",
+  group_col = "condition",
+  contrast = c("control", "experiment"),
+  DBSpecies = KeggPathwaysAedes,
+  AnalysisDomain = "own",
+  GeneIdentifier = "geneStableID"
+))
+
+res_se
+head(as.data.frame(SummarizedExperiment::rowData(res_se)))
+```
+
+## SingleCellExperiment with pseudo-bulk aggregation
+
+```{r sce-example, eval = requireNamespace("SingleCellExperiment", quietly = TRUE)}
+library(SingleCellExperiment)
+
+expr_sc <- cbind(expr, expr)
+colnames(expr_sc) <- paste0("cell_", seq_len(ncol(expr_sc)))
+
+sample_id <- rep(c("S1", "S2", "S3", "S4"), 2)
+cluster <- rep(c("A", "A", "B", "B"), 2)
+condition <- ifelse(sample_id %in% c("S1", "S3"), "control", "experiment")
+
+cd_sc <- S4Vectors::DataFrame(
+  sample_id = sample_id,
+  cluster = cluster,
+  condition = condition,
+  row.names = colnames(expr_sc)
+)
+
+sce <- SingleCellExperiment(
+  assays = list(counts = expr_sc),
+  colData = cd_sc
+)
+
+res_sce <- suppressMessages(run_adam(
+  x = sce,
+  mode = "partial",
+  assay_name = "counts",
+  group_col = "condition",
+  contrast = c("control", "experiment"),
+  aggregate_by = c("sample_id", "cluster", "condition"),
+  aggregate_fun = "sum",
+  DBSpecies = KeggPathwaysAedes,
+  AnalysisDomain = "own",
+  GeneIdentifier = "geneStableID"
+))
+
+res_sce
+head(as.data.frame(SummarizedExperiment::rowData(res_sce)))
+```
+
+## Reproducibility notes
+
+- For `mode = "complete"`, fix `SeedNumber` and `BootstrapNumber`.
+- Keep the same `ComparisonID`/`contrast` and annotation source (`DBSpecies`).
+- Record `sessionInfo()` in analysis reports.

@@ -1,6 +1,125 @@
 ############
 #Arguments checking and object building
 ############
+
+.adam_validate_required_inputs <- function(
+    ExpressionData,
+    ComparisonID,
+    AnalysisDomain,
+    DBSpecies,
+    GeneIdentifier
+) {
+    if (is.null(ExpressionData)) {
+        stop("Please provide a valid expression data input.")
+    }
+    if (is.null(ComparisonID)) {
+        stop("Please provide a valid comparison ID.")
+    }
+    if (is.null(AnalysisDomain)) {
+        stop("Please provide a valid analysis domain.")
+    }
+    if (is.null(DBSpecies)) {
+        stop("Please provide a valid species database.")
+    }
+    if (is.null(GeneIdentifier)) {
+        stop("Please provide a valid gene identifier.")
+    }
+}
+
+.adam_resolve_gene_limits <- function(MinGene, MaxGene) {
+    if (!is.null(MinGene) && !is.null(MaxGene)) {
+        GeneNumbers <- .checkGeneNumbers(MinGene, MaxGene)
+        return(list(MinGene = GeneNumbers[1], MaxGene = GeneNumbers[2]))
+    }
+    if (is.null(MinGene) && !is.null(MaxGene)) {
+        GeneNumbers <- .checkGeneNumbers(3L, MaxGene)
+        return(list(MinGene = GeneNumbers[1], MaxGene = GeneNumbers[2]))
+    }
+    if (!is.null(MinGene) && is.null(MaxGene)) {
+        GeneNumbers <- .checkGeneNumbers(MinGene, 2000L)
+        return(list(MinGene = GeneNumbers[1], MaxGene = GeneNumbers[2]))
+    }
+    list(
+        MinGene = 3L,
+        MaxGene = 2000L
+    )
+}
+
+.adam_resolve_analysis_inputs <- function(
+    AnalysisDomain,
+    DBSpecies,
+    GeneIdentifier,
+    GeneExpressionData
+) {
+    Analysis <- .checkAnalysisDomain_DBSpecies_GeneIdentifier(
+        AnalysisDomain,
+        DBSpecies,
+        GeneIdentifier,
+        GeneExpressionData
+    )
+    list(
+        DomainGroup = Analysis[[1]],
+        DataSpeciesFunctionsSample = Analysis[[2]],
+        DataSpeciesFunctionsRaw = Analysis[[3]],
+        GeneNomenclature = Analysis[[4]]
+    )
+}
+
+.adam_resolve_complete_options <- function(
+    SeedNumber,
+    BootstrapNumber,
+    PCorrection,
+    PCorrectionMethod,
+    WilcoxonTest,
+    FisherTest
+) {
+    list(
+        SeedNumber = if (is.null(SeedNumber)) 1049 else .checkSeedNumber(SeedNumber),
+        BootstrapNumber = if (is.null(BootstrapNumber)) 1000L else .checkBootstrapNumber(BootstrapNumber),
+        PCorrection = if (is.null(PCorrection)) 0.05 else .checkPCorrection(PCorrection),
+        PCorrectionMethod = if (is.null(PCorrectionMethod)) "fdr" else .checkPCorrectionMethod(PCorrectionMethod),
+        WilcoxonTest = if (is.null(WilcoxonTest)) FALSE else .checkWilcoxonTest(WilcoxonTest),
+        FisherTest = if (is.null(FisherTest)) FALSE else .checkFisherTest(FisherTest)
+    )
+}
+
+.adam_build_ecg_object <- function(
+    ComparisonID,
+    GeneExpressionData,
+    GeneLimits,
+    AnalysisData,
+    completeTest,
+    CompleteOptions = NULL
+) {
+    base_slots <- list(
+        ComparisonID = ComparisonID,
+        ExpressionData = GeneExpressionData,
+        MinGene = GeneLimits$MinGene,
+        MaxGene = GeneLimits$MaxGene,
+        DBSpeciesFunctionsSample = AnalysisData$DataSpeciesFunctionsSample,
+        DBSpeciesFunctionsRaw = AnalysisData$DataSpeciesFunctionsRaw,
+        AnalysisDomain = AnalysisData$DomainGroup,
+        GeneIdentifier = AnalysisData$GeneNomenclature
+    )
+
+    if (!completeTest) {
+        return(do.call(new, c(list(Class = "ECGMainData"), base_slots)))
+    }
+
+    complete_slots <- c(
+        base_slots,
+        list(
+            SeedNumber = CompleteOptions$SeedNumber,
+            BootstrapNumber = CompleteOptions$BootstrapNumber,
+            PCorrection = CompleteOptions$PCorrection,
+            PCorrectionMethod = CompleteOptions$PCorrectionMethod,
+            WilcoxonTest = CompleteOptions$WilcoxonTest,
+            FisherTest = CompleteOptions$FisherTest
+        )
+    )
+    do.call(new, c(list(Class = "ECGMainData"), complete_slots))
+}
+
 ECGMainData <- function(ComparisonID,
                         ExpressionData,
                         MinGene,
@@ -15,158 +134,49 @@ ECGMainData <- function(ComparisonID,
                         AnalysisDomain,
                         GeneIdentifier,
                         completeTest){
+    .adam_validate_required_inputs(
+        ExpressionData = ExpressionData,
+        ComparisonID = ComparisonID,
+        AnalysisDomain = AnalysisDomain,
+        DBSpecies = DBSpecies,
+        GeneIdentifier = GeneIdentifier
+    )
 
-    #Check the expression data. ExpressionData must be a data frame or a path
-    #for a text file tab separated containing at least 3
-    #columns. First column mandatory corresponds to gene names,
-    #according to GeneIdentifier argument. Second, third and the
-    #others correspond to the gene samples expression.
-    if(!is.null(ExpressionData)){
-        GeneExpressionData <- .checkExpressionData(ExpressionData)
-    }else{
-        stop("Please inform a valid expression data!")
-    }
+    GeneExpressionData <- .checkExpressionData(ExpressionData)
+    ComparisonID <- .checkComparisonID(ComparisonID, GeneExpressionData)
+    GeneLimits <- .adam_resolve_gene_limits(MinGene, MaxGene)
+    AnalysisData <- .adam_resolve_analysis_inputs(
+        AnalysisDomain = AnalysisDomain,
+        DBSpecies = DBSpecies,
+        GeneIdentifier = GeneIdentifier,
+        GeneExpressionData = GeneExpressionData
+    )
 
-    #Check the comparison IDs. ComparisonID argument must be a vector in wich 
-    #each element corresponds to 2 sample columns from
-    #the expression data. The data sample columns in each element from the
-    #vector are comma separated.
-    
-    if(!is.null(ComparisonID)){
-        ComparisonID <- .checkComparisonID(ComparisonID,GeneExpressionData)
-    }else{
-        stop("Please inform a valid comparison ID!")
-    }
-
-    #Check the minimum and maximum number of genes per group of a GFAG 
-    #(Group of Functionally Associated Genes). Both must be integer
-    #positive values and different from zero. Besides, the argument MaxGene 
-    #must be allways greater than MinGene.
-    if(!is.null(MinGene) & !is.null(MaxGene)){
-        GeneNumbers <- .checkGeneNumbers(MinGene,MaxGene)
-        InfGeneLimit <- GeneNumbers[1]
-        SupGeneLimit <- GeneNumbers[2]
-    }
-    if(is.null(MinGene)){
-        InfGeneLimit <- 3
-    }
-    if(is.null(MaxGene)){
-        SupGeneLimit <- 2000
+    if (!completeTest) {
+        return(.adam_build_ecg_object(
+            ComparisonID = ComparisonID,
+            GeneExpressionData = GeneExpressionData,
+            GeneLimits = GeneLimits,
+            AnalysisData = AnalysisData,
+            completeTest = FALSE
+        ))
     }
 
-    #Check the domain analysis, species reference database and gene 
-    #identifier. The argument AnalysisDomain must be a character
-    #corresponding to a domain (gobp, gocc, gomf, kegg or own). The argument
-    #DBSpecies must be a character corresponding to an
-    #OrgDb species package (org.Hs.eg.db, org.Dm.eg.db ...) or a character 
-    #path for an own gene annotation file containing 3 columns:
-    #gene name, term annotation and description of the term annotation. 
-    #The GeneIdentifier argument must be a character containing
-    #the nomenclature to be used (symbol or entrez).
-    if(!is.null(AnalysisDomain) & !is.null(DBSpecies) & 
-        !is.null(GeneIdentifier)){
-        Analysis<-.checkAnalysisDomain_DBSpecies_GeneIdentifier(
-                    AnalysisDomain,DBSpecies,GeneIdentifier,
-                    GeneExpressionData)
-        DomainGroup <- Analysis[[1]]
-        DataSpeciesFunctionsSample <- Analysis[[2]]
-        DataSpeciesFunctionsRaw <- Analysis[[3]]
-        GeneNomenclature <- Analysis[[4]]
-    }
-    if(is.null(AnalysisDomain)){
-        stop("Please inform a valid domain!")
-    }
-    if(is.null(DBSpecies)){
-        stop("Please inform a valid database species!")
-    }
-    if(is.null(GeneIdentifier)){
-        stop("Please inform a valid gene identifier!")
-    }
+    CompleteOptions <- .adam_resolve_complete_options(
+        SeedNumber = SeedNumber,
+        BootstrapNumber = BootstrapNumber,
+        PCorrection = PCorrection,
+        PCorrectionMethod = PCorrectionMethod,
+        WilcoxonTest = WilcoxonTest,
+        FisherTest = FisherTest
+    )
 
-    if(completeTest){
-        #Check the seed for random generation numbers. The argument SeedNumber
-        #must be a numeric value allways positive, greater than or
-        #equal to zero.
-        if(!is.null(SeedNumber)){
-            SeedNumber <- .checkSeedNumber(SeedNumber)
-        }else{
-            SeedNumber <- 10049
-        }
-        
-        #Check the number of bootstraps necessary for defining GFAG p-values.
-        #The argument BootstrapNumber must be an integer number
-        #greater than zero.
-        if(!is.null(BootstrapNumber)){
-            BootstrapNumber <- .checkBootstrapNumber(BootstrapNumber)
-        }else{
-            BootstrapNumber <- 1000
-        }
-        
-        #Check the cutoff to be used for one of the p-value correction 
-        #methods. The PCorrection argument must be a numeric value between
-        #zero and one.
-        if(!is.null(PCorrection)){
-            PCorrection <- .checkPCorrection(PCorrection)
-        }else{
-            PCorrection <- 0.05
-        }
-        
-        #Check the p-value correction method. The PCorrectionMethod argument
-        #must be a character corresponding to one of the p.adjust function
-        #correction methods (holm, hochberg, hommel, bonferroni, BH, BY, fdr).
-        if(!is.null(PCorrectionMethod)){
-            PCorrectionMethod <- .checkPCorrectionMethod(PCorrectionMethod)
-        }else{
-            PCorrectionMethod <- "fdr"
-        }
-        
-        #Check if it will be performed the Wilcoxon Rank Sum Test. The 
-        #WilcoxonTest argument should be TRUE for running the test or FALSE
-        #if the test won't be performed.
-        if(!is.null(WilcoxonTest)){
-            WilcoxonTest <- .checkWilcoxonTest(WilcoxonTest)
-        }else{
-            WilcoxonTest <- FALSE
-        }
-        
-        #Check if it will be performed the Fisher Exact Test. The FisherTest
-        #argument should be TRUE for running the test or FALSE
-        #if the test won't be performed.
-        if(!is.null(FisherTest)){
-            FisherTest <- .checkFisherTest(FisherTest)
-        }else{
-            FisherTest <- FALSE
-        }
-        
-        #Object building, according to the necessary arguments for running 
-        #complete analysis ADAM.
-        inputObject <- new(Class = "ECGMainData",
-                        ComparisonID = ComparisonID,
-                        ExpressionData = GeneExpressionData,
-                        MinGene = InfGeneLimit,
-                        MaxGene = SupGeneLimit,
-                        SeedNumber = SeedNumber,
-                        BootstrapNumber = BootstrapNumber,
-                        PCorrection = PCorrection,
-                        DBSpeciesFunctionsSample = DataSpeciesFunctionsSample,
-                        DBSpeciesFunctionsRaw = DataSpeciesFunctionsRaw,
-                        PCorrectionMethod = PCorrectionMethod,
-                        WilcoxonTest = WilcoxonTest,
-                        FisherTest = FisherTest,
-                        AnalysisDomain = DomainGroup,
-                        GeneIdentifier = GeneNomenclature)
-    }else{
-        #Object building, according to the necessary arguments for running 
-        #parcial analysis with ADAM.
-        inputObject <- new(Class = "ECGMainData",
-                        ComparisonID = ComparisonID,
-                        ExpressionData = GeneExpressionData,
-                        MinGene = InfGeneLimit,
-                        MaxGene = SupGeneLimit,
-                        DBSpeciesFunctionsSample = DataSpeciesFunctionsSample,
-                        DBSpeciesFunctionsRaw = DataSpeciesFunctionsRaw,
-                        AnalysisDomain = DomainGroup,
-                        GeneIdentifier = GeneNomenclature)
-    }
-    return(inputObject)
+    .adam_build_ecg_object(
+        ComparisonID = ComparisonID,
+        GeneExpressionData = GeneExpressionData,
+        GeneLimits = GeneLimits,
+        AnalysisData = AnalysisData,
+        completeTest = TRUE,
+        CompleteOptions = CompleteOptions
+    )
 }

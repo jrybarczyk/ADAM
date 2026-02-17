@@ -10,6 +10,10 @@ A data frame with 34 rows and 5 variables
 A sample fragment of gene expression from an RNA-seq 
 experiment of Aedes aegypti mosquito.
 }
+\value{
+A data frame containing gene identifiers in the first column and expression
+values for comparative samples in the remaining columns.
+}
 \examples{
 data(ExpressionAedes)
 }
