@@ -25,12 +25,6 @@ Authors@R:
                 family = "Edital Universal 14/2013 process 473789/2013-2",
                 role = "fnd")
 			 )
-Author: André Luiz Molan [aut],
-    Giordano Bruno Sanches Seco [ctb],
-    Agnes Takeda [ctb],
-    Jose Rybarczyk Filho [ctb, cre, ths],
-    Funding Edital Universal 14/2013 process 473789/2013-2 [fnd]
-Maintainer: Jose Rybarczyk Filho <jose.luiz@unesp.br>
 Description: Performs gene set enrichment analysis by grouping
     genes from comparative samples (control versus experiment) belonging to
     different species according to their respective functions (Gene Ontology
