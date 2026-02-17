@@ -45,7 +45,8 @@ clear priorities and an execution log.
 - [x] 2026-02-17: Added Bioconductor dataset model templates under `scripts/models/`.
 - [x] 2026-02-17: Updated `vignettes/ADAM.Rmd` to make `run_adam()` the default workflow.
 - [x] 2026-02-17: Aligned `ADAnalysis` and `GFAGAnalysis` man page messaging/examples to `run_adam()`-first guidance.
-- [ ] Next: plan analysis + visualization examples (Bioconductor-native reporting and plots).
+- [x] 2026-02-17: Added diversity/activity tile heatmap scripts in `scripts/visualization/` (run_adam output driven).
+- [ ] Next: extend visualization set with multi-comparison reporting panels (Bioconductor-native plotting workflow).
 
 ## Working Rules (devel)
 
